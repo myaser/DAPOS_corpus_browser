@@ -1,0 +1,8 @@
+Django==1.5.1
+Pillow
+south
+
+django-extensions
+django-debug-toolbar
+
+coveralls
