@@ -1,5 +1,5 @@
 from .fetcher import fetch_hash_tweets, fetch_user_tweets
-from corpus_browser.scrapper import models
+from indexer.models import Tweet
 
 
 def extract_data(json):
@@ -16,8 +16,10 @@ def extract_data(json):
         'links': [link['url'] for link in json['entities']['urls'] + json['entities']['media']],
     }
 
+
 def fetch():
-    heuristics = models.Heuristic.objects.all()
+    from scrapper.models import Heuristic
+    heuristics = Heuristic.objects.all()
     for heuristic in heuristics:
         data = map(heuristic.fetch_data(), extract_data)
-        models.Tweet.objects.bulk_create(map(data, lambda x: models.Tweet(**x)))
+        Tweet.objects.bulk_create(map(data, lambda x: Tweet(**x)))

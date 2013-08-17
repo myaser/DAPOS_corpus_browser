@@ -1,4 +1,4 @@
-from corpus_browser.scrapper import models
+from scrapper import models
 from django.contrib import admin
 
 

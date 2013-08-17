@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     'debug_toolbar_mongo',
 
 
-#     'scrapper',
+    'scrapper',
     'indexer',
 )
 
