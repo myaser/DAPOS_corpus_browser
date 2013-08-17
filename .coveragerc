@@ -1,7 +1,9 @@
 [run]
 branch = True
 source = corpus_browser/
-omit = corpus_browser/*/tests/*
+omit = corpus_browser/manage.py
+       corpus_browser/corpus_browser/
+       */tests/
 
 [html]
 directory = html_coverage_report

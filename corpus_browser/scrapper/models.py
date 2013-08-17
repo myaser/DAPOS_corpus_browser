@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from corpus_browser.scrapper.fields import ListField
-from corpus_browser.scrapper import crawler
+from scrapper.fields import ListField
+from scrapper import crawler
 
 
 class Heurstic(models.Model):

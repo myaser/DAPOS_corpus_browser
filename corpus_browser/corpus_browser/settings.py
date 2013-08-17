@@ -6,7 +6,6 @@ TEMPLATE_DEBUG = DEBUG
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                             os.path.pardir))
 
-
 ADMINS = (
     ('Mahmoud Yaser', 'me.MahmoudYaser@gmail.com'),
 )
@@ -15,15 +14,16 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'sqlite.db',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'corpus.db',
+    },
+    'mongo_db': {
+        'ENGINE': 'django_mongodb_engine',
+        'NAME': 'corpus',
     }
 }
+
+DATABASE_ROUTERS = ['indexer.router.MongoRouter']
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -102,8 +102,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'corpus_browser.urls'
@@ -124,29 +123,28 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
     'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+
+    'django_extensions',
+    'debug_toolbar',
+    'debug_toolbar_mongo',
+
+
+#     'scrapper',
+    'indexer',
 )
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
+# the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
@@ -159,7 +157,34 @@ LOGGING = {
     }
 }
 
+
+# -------------------------------- twitter API --------------------------------
 APP_KEY = 'Ss3Ns3PEKw1WBenxGsJQRw'
 CONSUMER_SERCRET = 'HegEtLSI4LQ7Aezpg80MeVN04hQQQ83pp2zYCWY5KA'
 ACCESS_TOKEN = u'92275128-tWqVjCYm5nPf9UZBw1Rj3QskMQRC15SIOeR4c'
 ACCESS_TOKEN_SECRET = 'R66fgDHiXmSxx9tTOX5f4OdMJh9QmRZEAybxSuxMaQ'
+
+# -------------------------------- debug toolbar ------------------------------
+
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.template.TemplateDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar_mongo.panel.MongoDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+)
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': True,
+    'SHOW_TOOLBAR_CALLBACK': lambda x: True,
+#     'EXTRA_SIGNALS': ,
+#     'HIDE_DJANGO_SQL': False,
+#     'SHOW_TEMPLATE_CONTEXT': ,
+#     'TAG': 'div',
+#     'ENABLE_STACKTRACES': ,
+}
+INTERNAL_IPS = ('127.0.0.1',)
