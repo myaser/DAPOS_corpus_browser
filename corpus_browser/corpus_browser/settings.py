@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'debug_toolbar',
     'debug_toolbar_mongo',
+    'djcelery',
 
 
     'scrapper',
@@ -157,6 +158,11 @@ LOGGING = {
     }
 }
 
+# -------------------------------- Celery -------------------------------------
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'mongodb://localhost:27017/dapos'
+CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
 
 # -------------------------------- twitter API --------------------------------
 APP_KEY = 'Ss3Ns3PEKw1WBenxGsJQRw'
