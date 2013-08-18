@@ -6,6 +6,7 @@ django-debug-toolbar-mongo
 
 coveralls
 twython
+django-celery
 
 # Django-nonrel
 git+https://github.com/django-nonrel/django@nonrel-1.3
