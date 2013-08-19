@@ -31,10 +31,25 @@ class Counter(StandardCounter):
                 result[elem] = count
         return result
 
+    def update(self, iterable=None, **kwds):
+
+        if iterable is not None:
+            if isinstance(iterable, Mapping):
+                if self:
+                    self_get = self.get
+                    for elem, count in iterable.iteritems():
+                        self[elem] = self_get(elem, Counter()) + count
+                else:
+                    super(Counter, self).update(iterable)  # fast path when counter is empty
+            else:
+                self_get = self.get
+                for elem in iterable:
+                    self[elem] = self_get(elem, 0) + 1
+        if kwds:
+            self.update(kwds)
+
 
 def model_repr(model):
-        representation = model.__dict__.copy()
-        del representation['_entity_exists']
-        del representation['_original_pk']
-        del representation['_state']
-        return representation.__repr__()
+    _dict = model.__dict__
+    representation = {k: v for k, v in _dict.items() if '__' not in k}
+    return representation.__repr__()

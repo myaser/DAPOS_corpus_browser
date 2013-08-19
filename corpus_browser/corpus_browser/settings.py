@@ -125,10 +125,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
+    'djcelery',
     'django_extensions',
     'debug_toolbar',
     'debug_toolbar_mongo',
-    'djcelery',
 
 
     'scrapper',

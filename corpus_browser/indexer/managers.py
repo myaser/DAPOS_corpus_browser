@@ -1,5 +1,4 @@
 from django.db import models
-# from collections import Counter
 from utils import Counter
 
 
@@ -24,4 +23,3 @@ class TweetsManager(models.Manager):
 
     def get_query_set(self):
         return TweetsQuerySet(self.model, using=self._db)
-

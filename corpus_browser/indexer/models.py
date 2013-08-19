@@ -62,6 +62,7 @@ class Tweet(models.Model):
 
 class Posting(models.Model):
 
+    # TODO: make it serializable
     document = models.ForeignKey(Tweet)
     positions = mongo_fields.ListField()
 
