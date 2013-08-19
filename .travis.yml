@@ -1,9 +1,16 @@
 language: python
+
 python:
   - "2.7"
-# command to install dependencies
-install: "./requirements/mongo.sh; pip install -r requirements/requirements.pip"
-# command to run tests
+
+before_install:
+  - apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+  - echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" | tee -a /etc/apt/sources.list.d/10gen.list
+  - sudo apt-get -y update -qq
+  - sudo apt-get -y install mongodb-10gen -qq
+
+install: "pip install -r requirements/requirements.pip"
+
 script: coverage run --rcfile="./.coveragerc" corpus_browser/manage.py test
 
 after_success:
