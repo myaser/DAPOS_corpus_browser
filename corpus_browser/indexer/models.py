@@ -4,21 +4,22 @@ from django.utils.translation import ugettext_lazy as _
 from djangotoolbox import fields as mongo_fields
 from indexer.managers import TweetsManager
 from utils import model_repr
+import time
 
 
 class IndexMixin():
 
     @property
     def document_frequency(self):
-        pass
+        return len(self.postings)
 
     @property
     def term_frequency(self):
-        pass
+        return sum([len(posting.positions) for posting in self.postings])
 
     @property
     def target_documents(self):
-        pass
+        return [posting.document for posting in self.postings]
 
     def __unicode__(self):
         return model_repr(self)
@@ -61,29 +62,48 @@ class Tweet(models.Model):
 
 
 class Posting(models.Model):
+    '''
+    encapsulate a search result
+    '''
 
     # TODO: make it serializable
     document = models.ForeignKey(Tweet)
     positions = mongo_fields.ListField()
-
-    @property
-    def target_document(self):
-        pass
 
     def __unicode__(self):
         return model_repr(self)
 
 
 class MainIndex(models.Model, IndexMixin):
+    '''
+    the index serving users' queries
+    '''
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
 
 
-class AuxilaryIndex(models.Model, IndexMixin):
+class AuxiliaryIndex(models.Model, IndexMixin):
+    '''
+    hold the data from scrapper to keep the MainIndex serving users
+    '''
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
 
-    def merge(self):
-        pass
+    @classmethod
+    def merge(cls, index):
+        '''
+        merge the Auxiliary index to the MainIndex.
+        '''
+        objs = cls.objects.all()
+        seg_length = 100
+        obj_lists = [objs[x:x + seg_length] for x in range(0, len(objs), seg_length)]
+
+        for obj_list in obj_lists:
+            # prevent overloading the index to stay serving users while merge
+            time.sleep(5)
+            for obj in obj_list:
+                index_entery = index.objects.get_or_create(token=obj.token)[0]
+                index_entery.postings += obj.postings_list
+                index_entery.save()

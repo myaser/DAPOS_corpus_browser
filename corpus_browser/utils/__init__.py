@@ -51,5 +51,5 @@ class Counter(StandardCounter):
 
 def model_repr(model):
     _dict = model.__dict__
-    representation = {k: v for k, v in _dict.items() if '__' not in k}
+    representation = {k: v for k, v in _dict.items() if not k.startswith('_')}
     return representation.__repr__()
