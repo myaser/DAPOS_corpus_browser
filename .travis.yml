@@ -5,6 +5,7 @@ python:
 
 before_install:
   - sudo su -c "requirements/mongo.sh"
+  - sudo service mongodb start
 
 install: "pip install -r requirements/requirements.pip"
 
