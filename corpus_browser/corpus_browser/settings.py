@@ -116,6 +116,13 @@ TEMPLATE_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
+
+LOCAL_APPS = (
+    'scrapper',
+    'indexer',
+)
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -125,15 +132,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
 
-    'djcelery',
-    'django_extensions',
     'debug_toolbar',
     'debug_toolbar_mongo',
+    'django_extensions',
+    'djcelery',
+    'discover_runner',
+) + LOCAL_APPS
 
-
-    'scrapper',
-    'indexer',
-)
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

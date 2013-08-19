@@ -9,7 +9,7 @@ before_install:
 
 install: "pip install -r requirements/requirements.pip"
 
-script: coverage run --rcfile="./.coveragerc" corpus_browser/manage.py test
+script: coverage run --rcfile="./.coveragerc" corpus_browser/manage.py test corpus_browser
 
 after_success:
     coveralls
