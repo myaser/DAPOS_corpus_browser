@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 
 from djangotoolbox import fields as mongo_fields
@@ -27,15 +27,9 @@ class IndexMixin():
 
 class Tweet(models.Model):
 
-    INFLUENCE_CHOICES = (
-        ('HF', 'highly influential'),
-        ('MF', 'influential'),
-        ('LF', ''),
-    )
     created_at = models.DateField(auto_now_add=True)
     user_id = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
-    influence = models.CharField(max_length=50, choices=INFLUENCE_CHOICES)
     tweet_text = models.TextField()
     tweet_id = models.CharField(max_length=100, unique=True)
     posting_date = models.DateField()
@@ -99,11 +93,12 @@ class AuxiliaryIndex(models.Model, IndexMixin):
         objs = cls.objects.all()
         seg_length = 100
         obj_lists = [objs[x:x + seg_length] for x in range(0, len(objs), seg_length)]
-
-        for obj_list in obj_lists:
-            # prevent overloading the index to stay serving users while merge
-            time.sleep(5)
-            for obj in obj_list:
-                index_entery = index.objects.get_or_create(token=obj.token)[0]
-                index_entery.postings += obj.postings_list
-                index_entery.save()
+        with transaction.commit_on_success():
+            for obj_list in obj_lists:
+                # prevent overloading the index to stay serving users while merge
+                time.sleep(5)
+                for obj in obj_list:
+                    index_entery = index.objects.get_or_create(token=obj.token)[0]
+                    index_entery.postings += obj.postings_list
+                    index_entery.save()
+        objs.delete()
