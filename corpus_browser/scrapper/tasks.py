@@ -4,7 +4,7 @@ import models
 from crawler import update_tweets
 
 
-@periodic_task(run_every=crontab(minute="*/1"))
+@periodic_task(run_every=crontab(hour="1"))
 def lunch_crawlers(num_of_crawlers=3):
     seg_length = (models.Criterion.objects.count() / num_of_crawlers) + 1
     criteria = models.Criterion.objects.all()

@@ -52,3 +52,4 @@ html_coverage_report/
 *.log
 *.pot
 local_settings.py
+/corpus_browser/celerybeat-schedule
