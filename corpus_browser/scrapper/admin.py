@@ -2,7 +2,7 @@ from scrapper import models
 from django.contrib import admin
 
 
-class HeursticAdmin(admin.ModelAdmin):
+class CriterionAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(models.Heurstic, HeursticAdmin)
+admin.site.register(models.Criterion, CriterionAdmin)

@@ -12,14 +12,16 @@ class Tweet(models.Model):
     )
     user_id = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
-    influence = models.CharField(max_length=50, choices=INFLUENCE_CHOICES)
+    influence = models.CharField(max_length=50, choices=INFLUENCE_CHOICES,
+                                 null=True, blank=True)
     tweet_text = models.TextField()
     tweet_id = models.CharField(max_length=100, unique=True)
-    posting_date = models.DateField()
-    retweets = models.IntegerField()
+    posting_date = models.DateField(null=True, blank=True)
+    retweets = models.IntegerField(null=True, blank=True)
     hash_tags = mongo_fields.ListField()
     mentions = mongo_fields.ListField()
     links = mongo_fields.ListField()
+
 
     class Meta:
         verbose_name = _('Tweet')
@@ -64,5 +66,7 @@ class AuxilaryIndex(MainIndex):
 
 # from datetime import date
 # from indexer.models import *
-# tweet = Tweet(user_id='', username='', influence='', tweet_text='', tweet_id='', posting_date=date(2013,3,3), hash_tags=[], mentions=[], links=[], retweets=0).save()
-#     
+# tweet = Tweet(user_id='', username='', influence='', tweet_text='',
+#               tweet_id='', posting_date=date(2013,3,3), hash_tags=[],
+#               mentions=[], links=[], retweets=0)
+# tweet.save()
