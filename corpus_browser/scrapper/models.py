@@ -20,8 +20,11 @@ class Criterion(models.Model):
         verbose_name_plural = _('Criteria')
 
     def __unicode__(self):
-        return u"#{0}".format(self.value) if self.type == self.HASH_TAG \
-            else u"@{0}".format(self.value)
+        if self.type == self.HASH_TAG:
+            if self.value.startswith('#'):
+                return u'{0}'.format(self.value)
+            return u"#{0}".format(self.value)
+        return u"@{0}".format(self.value)
 
     def fetch_data(self):
         return {
