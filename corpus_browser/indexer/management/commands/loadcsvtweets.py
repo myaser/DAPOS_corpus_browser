@@ -1,43 +1,72 @@
-import os
 import csv
+import os
 
-from django.utils import simplejson as json
-
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-TOPSY_SCRAP_DIR = '/media/my_files/data/Rania/topsy1_to_150/'
-
-FIXTURE_DIR = os.path.join(PROJECT_ROOT, 'data/fixtures')
+from indexer.models import Tweet
 
 
-def get_csv_file():
-    for path, dirlist, filelist in os.walk(TOPSY_SCRAP_DIR):
-        for mfile in filelist:
-            with open(path + mfile, 'rb') as csvfile:
-                csvfile.readline()
-                tweets_generator = csv.reader(csvfile,
-                                              delimiter=',', quotechar='"')
-                yield mfile.strip("topsySscrap.txt"), tweets_generator
+class Command(BaseCommand):
+    help = "Installs the named csvfile(s) in the Tweet database table.\n\
+if directory provided it will load all files in it"
+    args = "path [path ...]"
 
+    def handle(self, *csvfile_labels, **options):
 
-if __name__ == '__main__':
-    print 'start ...'
-    index = 1
-    for num, csvfile in get_csv_file():
-        print 'writing from file num {n} ...'.format(n=num)
-        m = 1
-        with transaction.commit_on_success():
-            for tweet in csvfile:
-                del tweet[2]
-                keys = ['user_id', 'username', 'tweet_text', 'tweet_id',
-                    'posting_date', 'retweets', 'hash_tags', 'mentions', 'links']
-                kwargs = dict(zip(keys, tweet))
-                kwargs['hash_tags'] = kwargs['hash_tags'].split(',')
-                kwargs['mentions'] = kwargs['mentions'].split(',')
-                kwargs['links'] = kwargs['links'].split(',')
-                print 'tweet num {m}'.format(m=m)
-#                print 'tweet num {m}: {tweet}'.format(m=m, tweet=kwargs)
+        loaded_object_count = 0  # successfully installed objects
+        csvfile_object_count = 0  # objects in csvfiles
 
-                tweet = Tweets.objects.get_or_create(tweet_id=kwargs['tweet_id'])[0]
-                tweet.update(**kwargs)
-                m += 1
+        # search file system
+        try:
+            files = []
+            for csvfile_label in csvfile_labels:
+                csvfile_label = os.path.abspath(csvfile_label)
+                if os.path.isdir(csvfile_label):
+                    for path, dirlist, filelist in os.walk(csvfile_label):
+                        self.stdout.write(
+                          "Searching folder '%s'...\n" % path)
+                        files.extend([os.path.join(path, _file)
+                                      for _file in filelist])
+                else:
+                    files.append(csvfile_label)
+            csvfile_count = len(files)
+        except Exception, e:
+            raise CommandError(e)
+
+        # parse csvfile
+        try:
+            def get_tweets(filelist):
+                for mfile in filelist:
+                    with open(mfile, 'rb') as csvfile:
+                        csvfile.readline()  # skip first line identifying schema
+                        tweets_generator = csv.reader(csvfile,
+                                                      delimiter=',', quotechar='"')
+                        self.stdout.write("Loading tweets from '%s' ...\n" %
+                                            mfile.rpartition('/')[2])
+                        yield tweets_generator
+        except Exception, e:
+            raise CommandError(e)
+
+        # write database
+        try:
+            with transaction.commit_on_success():
+                for tweets in get_tweets(files):
+                    for tweet in tweets:
+                        csvfile_object_count += 1
+                        del tweet[2]
+                        keys = ['user_id', 'username', 'tweet_text', 'tweet_id',
+                            'posting_date', 'retweets', 'hash_tags', 'mentions', 'links']
+                        kwargs = dict(zip(keys, tweet))
+                        kwargs['hash_tags'] = kwargs['hash_tags'].split(',')
+                        kwargs['mentions'] = kwargs['mentions'].split(',')
+                        kwargs['links'] = kwargs['links'].split(',')
+                        try:
+                            tweet = Tweet.objects.create(**kwargs)
+                            loaded_object_count += 1
+                        except Exception, e:
+                            self.stderr.write(e)
+            self.stdout.write("Installed {0} object(s) (of {1}) from {2} \
+csvfile(s)\n".format(loaded_object_count, csvfile_object_count, csvfile_count))
+        except Exception, e:
+            raise CommandError(e)

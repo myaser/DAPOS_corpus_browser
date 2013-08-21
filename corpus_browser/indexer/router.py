@@ -23,7 +23,9 @@ class MongoRouter(object):
         """
         mongo db needs no sync, and its models should not be synced
         """
-        if db == 'mongo_db' or model._meta.app_label in self.mongo_apps:
+#         if db == 'mongo_db' or model._meta.app_label in self.mongo_apps:
+#             return False
+        if db == 'mongo_db' != model._meta.app_label in self.mongo_apps:
             return False
 
         return None

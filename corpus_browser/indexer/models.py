@@ -5,6 +5,7 @@ from djangotoolbox import fields as mongo_fields
 from indexer.managers import TweetsManager
 from utils import model_repr
 import time
+import datetime
 
 
 class IndexMixin():
@@ -31,9 +32,9 @@ class Tweet(models.Model):
     user_id = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
     tweet_text = models.TextField()
-    tweet_id = models.CharField(max_length=100, unique=True)
-    posting_date = models.DateField()
-    retweets = models.IntegerField()
+    tweet_id = models.CharField(max_length=100, unique=True, null=False)
+    posting_date = models.DateField(default=datetime.date.today())
+    retweets = models.IntegerField(default=0)
     hash_tags = mongo_fields.ListField()
     mentions = mongo_fields.ListField()
     links = mongo_fields.ListField()
@@ -53,6 +54,11 @@ class Tweet(models.Model):
         linguistically process tweet_text and return tokenized terms
         '''
         return self.tweet_text.split()
+
+    def update(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        return self.save()
 
 
 class Posting(models.Model):
