@@ -31,10 +31,11 @@ class Tweet(models.Model):
     created_at = models.DateField(auto_now_add=True)
     user_id = models.CharField(max_length=50)
     username = models.CharField(max_length=50)
+
     tweet_text = models.TextField()
     tweet_id = models.CharField(max_length=100, unique=True, null=False)
-    posting_date = models.DateField(default=datetime.date.today())
-    retweets = models.IntegerField(default=0)
+    posting_date = models.DateField(null=True, blank=True)
+    retweets = models.IntegerField(null=True, blank=True)
     hash_tags = mongo_fields.ListField()
     mentions = mongo_fields.ListField()
     links = mongo_fields.ListField()

@@ -1,29 +1,33 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from scrapper import crawler
+from scrapper.crawler import fetcher
 
+# from tasks import lunch_crawlers
 
-class Heuristic(models.Model):
+class Criterion(models.Model):
     HASH_TAG = 'hash_tag'
     USER_NAME = 'user_name'
-    heurestics_supported = (
+    criteria_supported = (
         (HASH_TAG, 'Hash tag'),
         (USER_NAME, 'User name'),
     )
-    type = models.CharField(max_length=50, choices=heurestics_supported)
+    type = models.CharField(max_length=50, choices=criteria_supported)
     value = models.CharField(max_length=70)
-    last_tweet_id = models.CharField(max_length=100)
+    last_tweet_id = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        verbose_name = _('Heurstic')
-        verbose_name_plural = _('Heurstics')
+        verbose_name = _('Criterion')
+        verbose_name_plural = _('Criteria')
 
     def __unicode__(self):
-        return "#{0}".format(self.value) if self.type == self.hash_tag \
-            else "@{0}".format(self.value)
+        if self.type == self.HASH_TAG:
+            if self.value.startswith('#'):
+                return u'{0}'.format(self.value)
+            return u"#{0}".format(self.value)
+        return u"@{0}".format(self.value)
 
     def fetch_data(self):
         return {
-            self.USER_NAME: crawler.fetch_user_tweets,
-            self.HASH_TAG: crawler.fetch_hash_tweets,
+            self.USER_NAME: fetcher.fetch_user_tweets,
+            self.HASH_TAG: fetcher.fetch_hash_tweets,
         }.get(self.type)(self.value, self.last_tweet_id)
