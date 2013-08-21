@@ -1,10 +1,18 @@
-from indexer.models import Tweet, AuxiliaryIndex, Posting, MainIndex
 import datetime
+
+from celery.task.schedules import crontab
+from celery.task import periodic_task
+
 from django.db import transaction
 
+from indexer.models import Tweet, AuxiliaryIndex, Posting, MainIndex
 
-# @task
+
+@periodic_task(run_every=crontab(hour="1"), enabled=True)
 def build_index():
+    '''
+    daily task that indexes all Tweet objects from yesterday into AuxiliaryIndex
+    '''
     # TODO: performance optimization
     try:
         yesterday = datetime.date.fromordinal(datetime.date.today().toordinal() - 1)
@@ -23,8 +31,11 @@ def build_index():
         return False
 
 
-#@task
+@periodic_task(run_every=crontab(day_of_week="6", hour="13"), enabled=True)
 def merge_index():
+    '''
+    weekly task that merges AuxiliaryIndex into MainIndex
+    '''
     try:
         AuxiliaryIndex.merge(MainIndex)
         return True

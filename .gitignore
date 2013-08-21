@@ -43,6 +43,7 @@ html_coverage_report/
 # eclipse
 .project
 .pydevproject
+.settings
 
 #sqlite3
 *.db

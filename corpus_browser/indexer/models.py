@@ -5,7 +5,6 @@ from djangotoolbox import fields as mongo_fields
 from indexer.managers import TweetsManager
 from utils import model_repr
 import time
-import datetime
 
 
 class IndexMixin():
