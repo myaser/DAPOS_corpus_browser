@@ -2,7 +2,8 @@ Pillow
 
 django-extensions
 django-debug-toolbar
-django-debug-toolbar-mongo 
+django-debug-toolbar-mongo
+django-discover-runner 
 
 coveralls
 twython
