@@ -2,20 +2,23 @@ from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 
 from djangotoolbox import fields as mongo_fields
-from indexer.managers import TweetsManager
+from indexer.managers import TweetsManager, IndexManager
 from utils import model_repr
 import time
 
 
 class IndexMixin():
 
+    objects = IndexManager()
+
+    def clean(self):
+        self.term_frequency = sum([len(posting.positions)
+                                   for posting in self.postings])
+        models.Model.clean(self)
+
     @property
     def document_frequency(self):
         return len(self.postings)
-
-    @property
-    def term_frequency(self):
-        return sum([len(posting.positions) for posting in self.postings])
 
     @property
     def target_documents(self):
@@ -81,6 +84,7 @@ class MainIndex(models.Model, IndexMixin):
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
+    term_frequency = models.IntegerField()
 
 
 class AuxiliaryIndex(models.Model, IndexMixin):
@@ -90,6 +94,7 @@ class AuxiliaryIndex(models.Model, IndexMixin):
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
+    term_frequency = models.IntegerField()
 
     @classmethod
     def merge(cls, index):
