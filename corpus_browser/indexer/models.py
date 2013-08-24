@@ -11,10 +11,11 @@ class IndexMixin():
 
     objects = IndexManager()
 
-    def clean(self):
+    def save(self, *args, **kwargs):
+        import pdb; pdb.set_trace()
         self.term_frequency = sum([len(posting.positions)
                                    for posting in self.postings])
-        models.Model.clean(self)
+        models.Model.save(self, *args, **kwargs)
 
     @property
     def document_frequency(self):
@@ -84,7 +85,7 @@ class MainIndex(models.Model, IndexMixin):
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
-    term_frequency = models.IntegerField()
+    term_frequency = models.IntegerField(null=True)
 
 
 class AuxiliaryIndex(models.Model, IndexMixin):
@@ -94,7 +95,7 @@ class AuxiliaryIndex(models.Model, IndexMixin):
 
     token = models.CharField(max_length=10, unique=True)
     postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
-    term_frequency = models.IntegerField()
+    term_frequency = models.IntegerField(null=True)
 
     @classmethod
     def merge(cls, index):

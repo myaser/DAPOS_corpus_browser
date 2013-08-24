@@ -27,6 +27,7 @@ def build_index():
                 index_entery.save()
         return True
     except Exception, e:
+        print e
         # TODO: logging
         return False
 

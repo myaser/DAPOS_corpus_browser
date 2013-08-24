@@ -1,5 +1,6 @@
 from collections import Counter as StandardCounter
 from _abcoll import Mapping
+from django.forms.models import model_to_dict
 
 
 class Counter(StandardCounter):
@@ -50,6 +51,4 @@ class Counter(StandardCounter):
 
 
 def model_repr(model):
-    _dict = model.__dict__
-    representation = {k: v for k, v in _dict.items() if not k.startswith('_')}
-    return representation.__repr__()
+    return model_to_dict(model).__repr__()

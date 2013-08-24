@@ -28,3 +28,7 @@ class IndexQuerySet(models.query.QuerySet):
         '''
         pass
 
+    def proximity(self, proximity_list):
+        '''
+        '''
+        pass
