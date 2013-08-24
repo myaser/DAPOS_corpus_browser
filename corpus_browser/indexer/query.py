@@ -21,12 +21,19 @@ class TweetsQuerySet(models.query.QuerySet):
 
 class IndexQuerySet(models.query.QuerySet):
 
-    def intersect(self):
+    def intersect(self, *args, **kwargs):
         '''
         find documents that have all tokens of the query set.
         "AND boolean query"
         '''
-        pass
+        rows = self.filter(*args, **kwargs)
+        if not rows:
+            return set([])
+        postings = [set(row.postings) for row in rows]
+        common_postings = postings[0]
+        for posting in postings[1:]:
+            common_postings &= posting
+        return common_postings
 
     def proximity(self, proximity_list):
         '''

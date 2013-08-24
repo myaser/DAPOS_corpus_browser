@@ -77,6 +77,9 @@ class Posting(models.Model):
     def __unicode__(self):
         return model_repr(self)
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.document == other.document
+
 
 class MainIndex(models.Model, IndexMixin):
     '''
@@ -84,7 +87,7 @@ class MainIndex(models.Model, IndexMixin):
     '''
 
     token = models.CharField(max_length=10, unique=True)
-    postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
+    postings = mongo_fields.SetField(mongo_fields.EmbeddedModelField('Posting'))
     term_frequency = models.IntegerField(null=True)
 
 
@@ -94,7 +97,7 @@ class AuxiliaryIndex(models.Model, IndexMixin):
     '''
 
     token = models.CharField(max_length=10, unique=True)
-    postings = mongo_fields.ListField(mongo_fields.EmbeddedModelField('Posting'))
+    postings = mongo_fields.SetField(mongo_fields.EmbeddedModelField('Posting'))
     term_frequency = models.IntegerField(null=True)
 
     @classmethod
