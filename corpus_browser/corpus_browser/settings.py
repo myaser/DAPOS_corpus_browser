@@ -1,5 +1,6 @@
 # Django settings for corpus_browser project.
 import os
+from mongoengine import connect
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -16,14 +17,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'corpus.db',
-    },
-    'mongo_db': {
-        'ENGINE': 'django_mongodb_engine',
-        'NAME': 'corpus',
     }
 }
-
-DATABASE_ROUTERS = ['indexer.router.MongoRouter']
+connect('corpus')
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -148,9 +144,15 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
+            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
