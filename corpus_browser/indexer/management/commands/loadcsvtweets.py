@@ -2,8 +2,6 @@ import csv
 import os
 
 from django.core.management.base import BaseCommand, CommandError
-from django.db import transaction
-
 from indexer.models import Tweet
 
 
@@ -41,7 +39,7 @@ if directory provided it will load all files in it"
                     with open(mfile, 'rb') as csvfile:
                         csvfile.readline()  # skip first line identifying schema
                         tweets_generator = csv.reader(csvfile,
-                                                      delimiter=',', quotechar='"')
+                                              delimiter=',', quotechar='"')
                         self.stdout.write("Loading tweets from '%s' ...\n" %
                                             mfile.rpartition('/')[2])
                         yield tweets_generator
@@ -50,22 +48,21 @@ if directory provided it will load all files in it"
 
         # write database
         try:
-            with transaction.commit_on_success():
-                for tweets in get_tweets(files):
-                    for tweet in tweets:
-                        csvfile_object_count += 1
-                        del tweet[2]
-                        keys = ['user_id', 'username', 'tweet_text', 'tweet_id',
-                            'posting_date', 'retweets', 'hash_tags', 'mentions', 'links']
-                        kwargs = dict(zip(keys, tweet))
-                        kwargs['hash_tags'] = kwargs['hash_tags'].split(',')
-                        kwargs['mentions'] = kwargs['mentions'].split(',')
-                        kwargs['links'] = kwargs['links'].split(',')
-                        try:
-                            tweet = Tweet.objects.create(**kwargs)
-                            loaded_object_count += 1
-                        except Exception, e:
-                            self.stderr.write(e)
+            for tweets in get_tweets(files):
+                for tweet in tweets:
+                    csvfile_object_count += 1
+                    del tweet[2]
+                    keys = ['user_id', 'username', 'tweet_text', 'tweet_id',
+                        'posting_date', 'retweets', 'hash_tags', 'mentions', 'links']
+                    kwargs = dict(zip(keys, tweet))
+                    kwargs['hash_tags'] = kwargs['hash_tags'].split(',')
+                    kwargs['mentions'] = kwargs['mentions'].split(',')
+                    kwargs['links'] = kwargs['links'].split(',')
+                    mtweet, created = Tweet.objects.get_or_create(
+                                            tweet_id=kwargs['tweet_id'])
+                    mtweet.update(**kwargs)
+                    if created:
+                        loaded_object_count += 1
             self.stdout.write("Installed {0} object(s) (of {1}) from {2} \
 csvfile(s)\n".format(loaded_object_count, csvfile_object_count, csvfile_count))
         except Exception, e:

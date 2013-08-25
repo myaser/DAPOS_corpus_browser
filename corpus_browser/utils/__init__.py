@@ -51,4 +51,20 @@ class Counter(StandardCounter):
 
 
 def model_repr(model):
-    return model_to_dict(model).__repr__()
+    _dict = model.__dict__['_data']
+    return _dict.__repr__()
+
+
+def change_collection(collection=None):
+    '''
+    decorator to change db collection to support inheritance
+    '''
+    def wrap(cls):
+        def new_class(collection):
+            if collection:
+                meta = cls.__bases__[0]._meta.copy()
+                meta['collection'] = collection
+                cls._meta = meta
+            return cls
+        return new_class(collection)
+    return wrap

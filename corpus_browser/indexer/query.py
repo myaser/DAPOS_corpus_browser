@@ -1,14 +1,15 @@
-from django.db import models
 from utils import Counter
+from mongoengine import QuerySet
 
 
-class TweetsQuerySet(models.query.QuerySet):
+class TweetsQuerySet(QuerySet):
 
-    def index(self):
+    def index(self, *args, **kwargs):
         '''
         invert query results to be ready for indexing
         TODO: performance optimization and enhance the algorithm
         '''
+        self.filter(*args, **kwargs)  # delegate query to filter
 
         index = Counter()
         for tweet in self:
@@ -19,17 +20,17 @@ class TweetsQuerySet(models.query.QuerySet):
         return index
 
 
-class IndexQuerySet(models.query.QuerySet):
+class IndexQuerySet(QuerySet):
 
     def intersect(self, *args, **kwargs):
         '''
         find documents that have all tokens of the query set.
         "AND boolean query"
         '''
-        rows = self.filter(*args, **kwargs)
-        if not rows:
+        self.filter(*args, **kwargs)
+        if not self:
             return set([])
-        postings = [set(row.postings) for row in rows]
+        postings = [set(row.postings) for row in self]
         common_postings = postings[0]
         for posting in postings[1:]:
             common_postings &= posting
