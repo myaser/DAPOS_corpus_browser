@@ -11,5 +11,4 @@ coveralls
 twython
 django-celery
 
-
 mongoengine

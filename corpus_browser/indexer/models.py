@@ -8,6 +8,7 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
 
 from utils import model_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
+from indexer.fields import SetField
 
 
 class Tweet(Document):
@@ -47,7 +48,7 @@ class Posting(EmbeddedDocument):
     encapsulate a search result
     '''
 
-    document = ReferenceField('Tweet')
+    document = ReferenceField('Tweet', required=True)
     positions = ListField()
 
     def __unicode__(self):
@@ -63,7 +64,7 @@ class MainIndex(Document):
     '''
 
     token = StringField(unique=True)
-    postings = ListField(EmbeddedDocumentField(Posting))
+    postings = SetField(EmbeddedDocumentField(Posting))
     term_frequency = IntField()
 
     meta = {'queryset_class': IndexQuerySet,
@@ -81,9 +82,12 @@ class MainIndex(Document):
     def __unicode__(self):
         return model_repr(self)
 
-    def clean(self):
+    def clean(self, *args, **kwargs):
+        import pdb; pdb.set_trace()
         self.term_frequency = sum([len(posting.positions)
                                     for posting in self.postings])
+#         return Document.save(self, *args, **kwargs)
+#  [len(posting.positions) for posting in self.postings]
 
 
 @change_collection(collection='auxiliary_index')
