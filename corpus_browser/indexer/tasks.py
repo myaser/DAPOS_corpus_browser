@@ -22,8 +22,9 @@ def build_index():
         index_entery = AuxiliaryIndex.objects.get_or_create(token=token)[0]
         AuxiliaryIndex.objects(id=index_entery.id).update_one(
                                               push_all__postings=postings_list)
+        index_entery.reload()
+        index_entery.save()
 #         index_entery.postings += postings_list
-#         index_entery.save()
 
 
 @periodic_task(run_every=crontab(day_of_week="6", hour="13"), enabled=True)
