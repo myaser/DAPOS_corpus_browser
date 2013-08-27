@@ -12,6 +12,9 @@ class DefaultTest(TestCase):
         models.Criterion.objects.create(type='user_name', value=u'moemenology')
         models.Criterion.objects.create(type='user_name', value=u'Mah_Yaser')
 
+    def test_example(self):
+        self.assertEqual(2, 1 + 1)
+
 
 class FetchTest(DefaultTest):
     pass

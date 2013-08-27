@@ -3,8 +3,7 @@ from datetime import datetime
 
 
 from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
-         IntField, ListField, ReferenceField, EmbeddedDocumentField, CASCADE,
-         PULL)
+                 IntField, ListField, ReferenceField, EmbeddedDocumentField)
 
 from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
@@ -54,7 +53,8 @@ class Tweet(Document, DocumentFixturesMixin):
     mentions = ListField()
     links = ListField()
 
-    meta = {'queryset_class': TweetsQuerySet}
+    meta = {'queryset_class': TweetsQuerySet,
+            'allow_inheritance': True}
 
     def __unicode__(self):
         return document_repr(self)
