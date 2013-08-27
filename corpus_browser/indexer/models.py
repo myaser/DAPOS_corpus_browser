@@ -6,11 +6,41 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
          IntField, ListField, ReferenceField, EmbeddedDocumentField, CASCADE,
          PULL)
 
-from utils import model_repr, change_collection
+from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
 
 
-class Tweet(Document):
+class DocumentFixturesMixin(object):
+
+    @classmethod
+    def dump_data(cls, queryset=None, out_file_path=None, *args, **kwargs):
+        if not queryset:
+            queryset = cls.objects
+        json_data = queryset.to_json(*args, **kwargs)
+
+        if out_file_path:
+            open(out_file_path, 'w').write(json_data)
+        return json_data
+
+    @classmethod
+    def load_data(cls, in_data=None, in_file_path=None):
+
+        def created(obj):
+            obj._created = True
+            return obj
+
+        if bool(in_data) == bool(in_file_path):
+            raise Exception('can only take either in_data or in_file_path and not both')
+
+        json_data = in_data or open(in_file_path).read()
+        objects = cls.objects.from_json(json_data)
+        objects = map(created, objects)
+
+        cls.objects.insert(objects)
+        return objects
+
+
+class Tweet(Document, DocumentFixturesMixin):
 
     created_at = DateTimeField(default=datetime.now())
     user_id = StringField()
@@ -27,7 +57,7 @@ class Tweet(Document):
     meta = {'queryset_class': TweetsQuerySet}
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     @property
     def tokens(self):
@@ -51,7 +81,7 @@ class Posting(EmbeddedDocument):
     positions = ListField()
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.document == other.document
@@ -60,7 +90,7 @@ class Posting(EmbeddedDocument):
         return hash(self.document.id)
 
 
-class MainIndex(Document):
+class MainIndex(Document, DocumentFixturesMixin):
     '''
     the index serving users' queries
     '''
@@ -83,7 +113,7 @@ class MainIndex(Document):
         return [posting.document for posting in self.postings]
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     def clean(self, *args, **kwargs):
         self.postings = list(set(self.postings))

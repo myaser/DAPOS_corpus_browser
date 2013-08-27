@@ -50,7 +50,7 @@ class Counter(StandardCounter):
             self.update(kwds)
 
 
-def model_repr(model):
+def document_repr(model):
     _dict = model.__dict__['_data']
     return _dict.__repr__()
 

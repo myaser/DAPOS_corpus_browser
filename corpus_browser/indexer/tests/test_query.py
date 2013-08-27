@@ -13,6 +13,6 @@ class TestIndexQuerySet(TestCase):
         TestCase.setUp(self)
 
     def test_queries(self):
-        import pdb; pdb.set_trace()
+        pass
 
 
