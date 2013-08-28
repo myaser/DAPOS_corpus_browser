@@ -96,6 +96,7 @@ class MainIndex(Document, DocumentFixturesMixin):
     '''
 
     token = StringField(unique=True)
+
     # TODO: use SetField with postings
     postings = ListField(EmbeddedDocumentField(Posting))
     term_frequency = IntField()
@@ -103,6 +104,10 @@ class MainIndex(Document, DocumentFixturesMixin):
     meta = {'queryset_class': IndexQuerySet,
             'allow_inheritance': True,
             'indexes': ['token']}
+
+    @property
+    def postings_as_set(self):
+        return set(self.postings)
 
     @property
     def document_frequency(self):

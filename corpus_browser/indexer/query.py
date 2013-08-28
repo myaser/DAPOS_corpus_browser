@@ -9,7 +9,7 @@ class TweetsQuerySet(QuerySet):
         invert query results to be ready for indexing
         TODO: performance optimization and enhance the algorithm
         '''
-        self.filter(*args, **kwargs)  # delegate query to filter
+        self = self.filter(*args, **kwargs)  # delegate query to filter
 
         index = Counter()
         for tweet in self:
@@ -27,16 +27,12 @@ class IndexQuerySet(QuerySet):
         find documents that have all tokens of the query set.
         "AND boolean query"
         '''
-        self.filter(*args, **kwargs)
-        if not self:
-            return set([])
-        postings = [set(row.postings) for row in self]
-        common_postings = postings[0]
-        for posting in postings[1:]:
-            common_postings &= posting
-        return common_postings
 
-    def proximity(self, proximity_list):
+
+    def proximity(self, *args, **kwargs):
         '''
+        do positional search and return documents that has all tokens of the
+        query set near each other
         '''
-        pass
+        self = self.intersect(*args, **kwargs)
+

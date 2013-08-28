@@ -2,7 +2,7 @@ import os
 
 from corpus_browser.settings import PROJECT_ROOT
 
-from indexer.tests import TestTweet, MongoTestCase
+from indexer.tests import TestTweet, MongoTestCase, TestIndex
 
 
 class FixturesTest(MongoTestCase):
@@ -46,24 +46,26 @@ class FixturesTest(MongoTestCase):
         self.assertEqual(self.object,
                          TestTweet.load_data(in_file_path=self.json_file_path))
 
+    def test_dump_data(self):
+        pass
 
-# class IndexTest(MongoTestCase):
-# 
-#     def setUp(self):
-#         TestCase.setUp(self)
-#         fixture_file = os.path.join(PROJECT_ROOT, 'indexer/fixtures/testindex.json')
-#         fixture = open(fixture_file).read()
-#         AuxiliaryIndex.load_data(fixture)
-# 
-#     def test_target_documents(self):
-#         AuxiliaryIndex.objects.get(id='521b0cd2c454fe116c319878')
-#         pass
-# 
-#     def test_creation(self):
-#         pass
-# 
-#     def test_frequencies(self):
-#         pass
-# 
-#     def test_merge(self):
-#         pass
+
+class IndexTest(MongoTestCase):
+
+    def setUp(self):
+        fixture_file = os.path.join(PROJECT_ROOT, 'indexer/fixtures/testindex.json')
+        fixture = open(fixture_file).read()
+        TestIndex.load_data(fixture)
+
+    def test_target_documents(self):
+        TestIndex.objects.get(id='521b0cd2c454fe116c319878')
+        pass
+
+    def test_creation(self):
+        pass
+
+    def test_frequencies(self):
+        pass
+
+    def test_merge(self):
+        pass
