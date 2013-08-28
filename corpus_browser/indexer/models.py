@@ -3,15 +3,43 @@ from datetime import datetime
 
 
 from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
-         IntField, ListField, ReferenceField, EmbeddedDocumentField, CASCADE,
-         PULL)
+                 IntField, ListField, ReferenceField, EmbeddedDocumentField)
 
-from utils import model_repr, change_collection
+from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
-from indexer.fields import SetField
 
 
-class Tweet(Document):
+class DocumentFixturesMixin(object):
+
+    @classmethod
+    def dump_data(cls, queryset=None, out_file_path=None, *args, **kwargs):
+        if not queryset:
+            queryset = cls.objects
+        json_data = queryset.to_json(*args, **kwargs)
+
+        if out_file_path:
+            open(out_file_path, 'w').write(json_data)
+        return json_data
+
+    @classmethod
+    def load_data(cls, in_data=None, in_file_path=None):
+
+        def created(obj):
+            obj._created = True
+            return obj
+
+        if bool(in_data) == bool(in_file_path):
+            raise Exception('can only take either in_data or in_file_path and not both')
+
+        json_data = in_data or open(in_file_path).read()
+        objects = cls.objects.from_json(json_data)
+        objects = map(created, objects)
+
+        cls.objects.insert(objects)
+        return objects
+
+
+class Tweet(Document, DocumentFixturesMixin):
 
     created_at = DateTimeField(default=datetime.now())
     user_id = StringField()
@@ -25,10 +53,11 @@ class Tweet(Document):
     mentions = ListField()
     links = ListField()
 
-    meta = {'queryset_class': TweetsQuerySet}
+    meta = {'queryset_class': TweetsQuerySet,
+            'allow_inheritance': True}
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     @property
     def tokens(self):
@@ -52,19 +81,23 @@ class Posting(EmbeddedDocument):
     positions = ListField()
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.document == other.document
 
+    def __hash__(self):
+        return hash(self.document.id)
 
-class MainIndex(Document):
+
+class MainIndex(Document, DocumentFixturesMixin):
     '''
     the index serving users' queries
     '''
 
     token = StringField(unique=True)
-    postings = SetField(EmbeddedDocumentField(Posting))
+    # TODO: use SetField with postings
+    postings = ListField(EmbeddedDocumentField(Posting))
     term_frequency = IntField()
 
     meta = {'queryset_class': IndexQuerySet,
@@ -80,14 +113,12 @@ class MainIndex(Document):
         return [posting.document for posting in self.postings]
 
     def __unicode__(self):
-        return model_repr(self)
+        return document_repr(self)
 
     def clean(self, *args, **kwargs):
-        import pdb; pdb.set_trace()
+        self.postings = list(set(self.postings))
         self.term_frequency = sum([len(posting.positions)
                                     for posting in self.postings])
-#         return Document.save(self, *args, **kwargs)
-#  [len(posting.positions) for posting in self.postings]
 
 
 @change_collection(collection='auxiliary_index')
@@ -95,9 +126,6 @@ class AuxiliaryIndex(MainIndex):
     '''
     hold the data from scrapper to keep the MainIndex serving users
     '''
-
-#     meta = MainIndex._meta.copy()
-#     meta['collection'] = 'auxiliary_index'
 
     @classmethod
     def merge(cls, index):
@@ -108,14 +136,12 @@ class AuxiliaryIndex(MainIndex):
         seg_length = 100
         obj_lists = [objs[x:x + seg_length] for x in range(0, len(objs), seg_length)]
         for obj_list in obj_lists:
-            # prevent overloading the index to stay serving users while merge
-#             time.sleep(5)
+            time.sleep(5)
             for obj in obj_list:
                 index_entery = index.objects.get_or_create(token=obj.token)[0]
                 index_entery.postings += obj.postings
                 index_entery.save()
-        import pdb; pdb.set_trace()
         objs.delete()
 
 
-# Tweet.register_delete_rule(MainIndex, 'postings', PULL)
+# TODO: when tweet is deleted, remove from index
