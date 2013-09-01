@@ -84,7 +84,7 @@ class Posting(EmbeddedDocument):
         return document_repr(self)
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.document == other.document
+        return isinstance(other, self.__class__) and self.document.id == other.document.id
 
     def __hash__(self):
         return hash(self.document.id)

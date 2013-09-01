@@ -27,6 +27,14 @@ class IndexQuerySet(QuerySet):
         find documents that have all tokens of the query set.
         "AND boolean query"
         '''
+        self = self.filter(*args, **kwargs)
+        if not self:
+            return set([])
+        postings = [set(row.postings) for row in self]
+        common_postings = postings[0].copy()
+        for posting in postings[1:]:
+            common_postings &= posting
+        return common_postings
 
 
     def proximity(self, *args, **kwargs):
