@@ -39,13 +39,18 @@ class IndexQuerySet(QuerySet):
             for _posting in list(itertools.chain.from_iterable(self)):
                     if posting == _posting:
                         posting.positions.extend(_posting.positions)
-        return result
+        return list(result)
 
-    def proximity(self, *args, **kwargs):
+    def proximity(self, window=1, *args, **kwargs):
         '''
         do positional search and return documents that has all tokens of the
-        query set near each other
+        query set near each other in window size
         '''
-        result = self.intersect(*args, **kwargs)
-
-
+        common = self.intersect(*args, **kwargs)
+        result = []
+        for posting in common:
+            positions_lists = zip(*posting.positions)[1]
+            for item in itertools.product(*positions_lists):
+                if max(item) - min(item) <= window:
+                    result.append(posting)
+        return result
