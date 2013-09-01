@@ -4,6 +4,6 @@
 from query_processor_strategy import QueryProcessorStrategy
 
 
-class TTest(QueryProcessorStrategy):
+class NGram(QueryProcessorStrategy):
     def calc(self):
         pass

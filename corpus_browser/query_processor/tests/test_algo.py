@@ -1,8 +1,9 @@
 from django.test import TestCase
-from query_processor.llh import loglikelihood
-from query_processor.mi import mutual_information
-from query_processor.negma import negma
-from query_processor.tscore import t_score
+from query_processor.llh import LogLikeliHood
+from query_processor.mi import MutualInformation
+from query_processor.ngram import NGram
+from query_processor.tscore import TTest
+from query_processor import make_query_processor, QueryProcessor
 
 
 class DefaultTest(TestCase):
@@ -16,10 +17,33 @@ class DefaultTest(TestCase):
         self.span = 6
 
 
+class TestQueryProcessorCreator(TestCase):
+    def test_make_loglikelihood(self):
+        self.processor = make_query_processor('loglikelihood')
+        self.assertTrue(isinstance(self.processor, QueryProcessor))
+        self.assertTrue(isinstance(self.processor.strategy, LogLikeliHood))
+
+    def test_make_mutual_information(self):
+        self.processor = make_query_processor('mutual_information')
+        self.assertTrue(isinstance(self.processor, QueryProcessor))
+        self.assertTrue(isinstance(self.processor.strategy, MutualInformation))
+
+    def test_make_t_score(self):
+        self.processor = make_query_processor('t-score')
+        self.assertTrue(isinstance(self.processor, QueryProcessor))
+        self.assertTrue(isinstance(self.processor.strategy, TTest))
+
+
+    def test_make_ngram(self):
+        self.processor = make_query_processor('ngram')
+        self.assertTrue(isinstance(self.processor, QueryProcessor))
+        self.assertTrue(isinstance(self.processor.strategy, NGram))
+
+
 class TestLogLikelihood(DefaultTest):
     def test_method(self):
         self.assertEqual(
-            round(loglikelihood(
+            round(make_query_processor('loglikelihood').calc(
                 self.freq1,
                 self.freq2,
                 self.collocate_freq,
@@ -33,7 +57,7 @@ class TestLogLikelihood(DefaultTest):
 class TestMutualInformation(DefaultTest):
     def test_method(self):
         self.assertEqual(
-            round(mutual_information(
+            round(make_query_processor('mutual_information').calc(
                 self.freq1,
                 self.freq2,
                 self.collocate_freq,
@@ -47,7 +71,7 @@ class TestMutualInformation(DefaultTest):
 class TestNegma(DefaultTest):
     def test_method(self):
         self.assertEqual(
-            round(negma(
+            round(make_query_processor('ngram').calc(
                 self.freq1,
                 self.freq2,
                 self.collocate_freq,
@@ -58,10 +82,10 @@ class TestNegma(DefaultTest):
         )
 
 
-class TestTScore(DefaultTest):
+class TestTTest(DefaultTest):
     def test_method(self):
         self.assertEqual(
-            round(t_score(
+            round(make_query_processor('t-score').calc(
                 self.freq1,
                 self.freq2,
                 self.collocate_freq,
