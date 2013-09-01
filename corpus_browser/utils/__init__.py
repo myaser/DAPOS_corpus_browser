@@ -1,6 +1,7 @@
 from collections import Counter as StandardCounter
 from _abcoll import Mapping
 from django.forms.models import model_to_dict
+from timeit import itertools
 
 
 class Counter(StandardCounter):
@@ -10,12 +11,7 @@ class Counter(StandardCounter):
 
     def __add__(self, other):
         '''Add counts from two counters.
-
-        >>> Counter('abbb') + Counter('bcc')
-        Counter({'b': 4, 'c': 2, 'a': 1})
-
         '''
-#         import pdb; pdb.set_trace()
         if not isinstance(other, Counter):
             return NotImplemented
         result = Counter()

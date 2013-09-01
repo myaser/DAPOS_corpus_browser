@@ -120,10 +120,20 @@ class MainIndex(Document, DocumentFixturesMixin):
     def __unicode__(self):
         return document_repr(self)
 
+    def __cmp__(self, other):
+        return cmp(self.document_frequency, other.document_frequency)
+
     def clean(self, *args, **kwargs):
         self.postings = list(set(self.postings))
         self.term_frequency = sum([len(posting.positions)
                                     for posting in self.postings])
+
+    @property
+    def as_result(self):
+        result = self.postings[:]
+        for document in result:
+            document.positions = [(self.token, document.positions)]
+        return result
 
 
 @change_collection(collection='auxiliary_index')

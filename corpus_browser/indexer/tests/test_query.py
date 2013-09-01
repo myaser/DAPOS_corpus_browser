@@ -1,7 +1,5 @@
 import os
 
-from django.test import TestCase
-
 from corpus_browser.settings import PROJECT_ROOT
 from indexer.tests import TestTweet, MongoTestCase, TestIndex
 

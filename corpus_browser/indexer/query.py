@@ -1,5 +1,6 @@
 from utils import Counter
 from mongoengine import QuerySet
+import itertools
 
 
 class TweetsQuerySet(QuerySet):
@@ -26,21 +27,25 @@ class IndexQuerySet(QuerySet):
         '''
         find documents that have all tokens of the query set.
         "AND boolean query"
+        TODO: performance enhancement
         '''
-        self = self.filter(*args, **kwargs)
-        if not self:
-            return set([])
-        postings = [set(row.postings) for row in self]
-        common_postings = postings[0].copy()
-        for posting in postings[1:]:
-            common_postings &= posting
-        return common_postings
+        self = self.filter(*args, **kwargs).order_by()
 
+        self = [index.as_result for index in self]
+        result, remaining = set(self[0]), self[1:]
+
+        result = result.intersection(*remaining)
+        for posting in result:
+            for _posting in list(itertools.chain.from_iterable(self)):
+                    if posting == _posting:
+                        posting.positions.extend(_posting.positions)
+        return result
 
     def proximity(self, *args, **kwargs):
         '''
         do positional search and return documents that has all tokens of the
         query set near each other
         '''
-        self = self.intersect(*args, **kwargs)
+        result = self.intersect(*args, **kwargs)
+
 
