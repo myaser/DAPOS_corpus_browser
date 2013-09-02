@@ -106,16 +106,19 @@ class MainIndex(Document, DocumentFixturesMixin):
             'indexes': ['token']}
 
     @property
-    def postings_as_set(self):
-        return set(self.postings)
-
-    @property
     def document_frequency(self):
         return len(self.postings)
 
     @property
     def target_documents(self):
         return [posting.document for posting in self.postings]
+
+    @property
+    def as_result(self):
+        result = self.postings[:]
+        for document in result:
+            document.positions = [(self.token, document.positions)]
+        return result
 
     def __unicode__(self):
         return document_repr(self)
@@ -128,13 +131,6 @@ class MainIndex(Document, DocumentFixturesMixin):
         self.term_frequency = sum([len(posting.positions)
                                     for posting in self.postings])
 
-    @property
-    def as_result(self):
-        result = self.postings[:]
-        for document in result:
-            document.positions = [(self.token, document.positions)]
-        return result
-
 
 @change_collection(collection='auxiliary_index')
 class AuxiliaryIndex(MainIndex):
@@ -143,7 +139,7 @@ class AuxiliaryIndex(MainIndex):
     '''
 
     @classmethod
-    def merge(cls, index):
+    def merge(cls, index, sleep=5):
         '''
         merge the Auxiliary index to the MainIndex.
         '''
@@ -151,12 +147,19 @@ class AuxiliaryIndex(MainIndex):
         seg_length = 100
         obj_lists = [objs[x:x + seg_length] for x in range(0, len(objs), seg_length)]
         for obj_list in obj_lists:
-            time.sleep(5)
+            time.sleep(sleep)
             for obj in obj_list:
-                index_entery = index.objects.get_or_create(token=obj.token)[0]
-                index_entery.postings += obj.postings
-                index_entery.save()
+                index.objects.add_postings(obj.token, obj.postings)
         objs.delete()
 
+
+@change_collection(collection='test_Index')
+class TestIndex(AuxiliaryIndex):
+    pass
+
+
+@change_collection(collection='test_tweet')
+class TestTweet(Tweet):
+    pass
 
 # TODO: when tweet is deleted, remove from index

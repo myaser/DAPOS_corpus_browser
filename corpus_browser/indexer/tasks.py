@@ -18,13 +18,7 @@ def build_index():
     for token, postings in indexed_tweets.items():
         postings_list = [Posting(document=Tweet.objects.get(id=doc_id), positions=pos)
                          for doc_id, pos in postings.items()]
-#         import pdb; pdb.set_trace()
-        index_entery = AuxiliaryIndex.objects.get_or_create(token=token)[0]
-        AuxiliaryIndex.objects(id=index_entery.id).update_one(
-                                              push_all__postings=postings_list)
-        index_entery.reload()
-        index_entery.save()
-#         index_entery.postings += postings_list
+        AuxiliaryIndex.objects.add_postings(token, postings_list)
 
 
 @periodic_task(run_every=crontab(day_of_week="6", hour="13"), enabled=True)

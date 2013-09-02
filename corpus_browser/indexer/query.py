@@ -23,6 +23,12 @@ class TweetsQuerySet(QuerySet):
 
 class IndexQuerySet(QuerySet):
 
+    def add_postings(self, token, postings):
+        index_entery = self.get_or_create(token=token)[0]
+#         import pdb; pdb.set_trace()
+        index_entery.postings.extend(postings)
+        index_entery.save()
+
     def intersect(self, *args, **kwargs):
         '''
         find documents that have all tokens of the query set.
