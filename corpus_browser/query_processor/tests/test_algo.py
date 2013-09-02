@@ -44,41 +44,86 @@ class TestLogLikelihood(DefaultTest):
     def test_method(self):
         self.assertEqual(
             round(make_query_processor('loglikelihood').calc(
-                self.freq1,
-                self.freq2,
-                self.collocate_freq,
-                self.corpus_size,
-                self.span
+                12593,
+                932,
+                150,
+                14307668,
+                6
             ), 2),
-            1111
+            1291.42
         )
-
+        self.assertEqual(
+            round(make_query_processor('loglikelihood').calc(
+                379,
+                932,
+                10,
+                14307668,
+                6
+            ), 2),
+            99.31
+        )
+        self.assertEqual(
+            round(make_query_processor('loglikelihood').calc(
+                932,
+                934,
+                10,
+                14307668,
+                6
+            ), 2),
+            82.96
+        )
+        self.assertEqual(
+            round(make_query_processor('loglikelihood').calc(
+                932,
+                3424,
+                13,
+                14307668,
+                6
+            ), 2),
+            80.39
+        )
+        self.assertEqual(
+            round(make_query_processor('loglikelihood').calc(
+                932,
+                291,
+                6,
+                14307668,
+                6
+            ), 2),
+            57.27
+        )
 
 class TestMutualInformation(DefaultTest):
     def test_method(self):
         self.assertEqual(
             round(make_query_processor('mutual_information').calc(
-                self.freq1,
-                self.freq2,
-                self.collocate_freq,
-                self.corpus_size,
-                self.span
+                42,
+                20,
+                20,
+                14307668,
+                6
             ), 2),
-            11.37
+            18.38
         )
-
-
-class TestNegma(DefaultTest):
-    def test_method(self):
         self.assertEqual(
-            round(make_query_processor('ngram').calc(
-                self.freq1,
-                self.freq2,
-                self.collocate_freq,
-                self.corpus_size,
-                self.span
+            round(make_query_processor('mutual_information').calc(
+                13484,
+                10570,
+                20,
+                14307668,
+                6
             ), 2),
-            1111
+            1.01
+        )
+        self.assertEqual(
+            round(make_query_processor('mutual_information').calc(
+                106,
+                6,
+                1,
+                14307668,
+                6
+            ), 2),
+            14.46
         )
 
 
@@ -86,11 +131,31 @@ class TestTTest(DefaultTest):
     def test_method(self):
         self.assertEqual(
             round(make_query_processor('t-score').calc(
-                self.freq1,
-                self.freq2,
-                self.collocate_freq,
-                self.corpus_size,
-                self.span
-            ), 2),
-            1111
+                15828,
+                4675,
+                8,
+                14307668,
+                6
+            ), 6),
+            0.999932
+        )
+        self.assertEqual(
+            round(make_query_processor('t-score').calc(
+                42,
+                20,
+                20,
+                14307668,
+                6
+            ), 4),
+            4.4721
+        )
+        self.assertEqual(
+            round(make_query_processor('t-score').calc(
+                14907,
+                9017,
+                20,
+                14307668,
+                6
+            ), 4),
+            2.3714
         )
