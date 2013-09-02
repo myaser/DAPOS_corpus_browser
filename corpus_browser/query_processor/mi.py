@@ -1,10 +1,20 @@
 #! /usr/bin/python
 # -*- Coding:UTF-8 -*-
 
-from query_processor_strategy import QueryProcessorStrategy
-from math import log10
+from llh import LogLikeliHood
+from math import log
 
 
-class MutualInformation(QueryProcessorStrategy):
-    def calc(freq1, freq2, collocate_freq, corpus_size, span=6):
-        return log10((collocate_freq*corpus_size)/(freq1*freq2*span))/log10(2)
+class MutualInformation(LogLikeliHood):
+    def calc(self, freq1, freq2, collocate_freq, corpus_size, span=6):
+        self.freq1, self.freq2 = float(freq1), float(freq2)
+        self.collocate_freq = float(collocate_freq)
+        self.corpus_size = float(corpus_size)
+        self.span = span
+        return self.I()
+
+    def I(self):
+        return log(self.posipility(self.collocate_freq) / (self.posipility(self.freq1) * self.posipility(self.freq2)), 2)
+
+    def posipility(self, freq):
+        return freq / self.corpus_size
