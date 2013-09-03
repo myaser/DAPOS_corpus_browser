@@ -23,7 +23,6 @@ class TasksTest(MongoTestCase):
         Tweet.load_data(self.tweet_fixture)
 
     def test_build_index(self):
-
         def remove_id(obj):
             del obj.id
             return obj
@@ -37,8 +36,6 @@ class TasksTest(MongoTestCase):
         self.assertListEqual(result, desired)
 
     def test_merge_index(self):
-        self.skipTest('takes very long time')
-
         def modify_object(obj):
             obj._created = True
             obj.postings = obj.postings[:len(obj.postings) / 2]
@@ -49,14 +46,16 @@ class TasksTest(MongoTestCase):
                       MainIndex.objects.from_json(self.index_fixture))
         MainIndex.objects.insert(objects)
 
-        desired = [obj.__dict__['_data'] for obj in AuxiliaryIndex.objects]
+        desired = sorted([obj.__dict__['_data'] for obj in AuxiliaryIndex.objects], key=lambda x:x['token'])
 
         merge_index(sleep=0.1)
 
-        result = [obj.__dict__['_data'] for obj in MainIndex.objects]
+        result = sorted([obj.__dict__['_data'] for obj in MainIndex.objects], key=lambda x:x['token'])
 
         self.assertEqual(AuxiliaryIndex.objects.count(), 0)
 
-        # i may need to sort postings before assertion
-        for i in range(len(result)): print i, result[i]==desired[i]
-#         self.assertEqual(result, desired)
+        for i in range(len(result)):
+            result[i]['postings'] = set(result[i]['postings'])
+            desired[i]['postings'] = set(desired[i]['postings'])
+        self.assertEqual(result, desired)
+
