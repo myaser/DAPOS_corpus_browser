@@ -1,18 +1,19 @@
 import os
 
-from django.test import TestCase
-
 from corpus_browser.settings import PROJECT_ROOT
-from indexer.management.commands.loadcsvtweets import Command as LoadTweets
-from indexer.tasks import build_index
+from indexer.models import AuxiliaryIndex
+from indexer.tests import MongoTestCase
 
 
-class TestIndexQuerySet(TestCase):
+class TestIndexQuerySet(MongoTestCase):
 
     def setUp(self):
-        TestCase.setUp(self)
+        fixture_file = os.path.join(PROJECT_ROOT, 'indexer/fixtures/testindex.json')
+        fixture = open(fixture_file).read()
+        AuxiliaryIndex.load_data(fixture)
 
-    def test_queries(self):
-        pass
+    def test_proximity(self):
+        AuxiliaryIndex.objects.proximity(token__in=["@AlshakeroN", u"\u060c"])
+
 
 
