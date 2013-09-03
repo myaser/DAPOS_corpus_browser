@@ -5,15 +5,16 @@ from celery.task import periodic_task
 
 from indexer.models import Tweet, AuxiliaryIndex, Posting, MainIndex
 
+YESTERDAY = datetime.date.fromordinal(datetime.date.today().toordinal() - 1)
+
 
 @periodic_task(run_every=crontab(hour="1"), enabled=True)
-def build_index():
+def build_index(from_date=YESTERDAY):
     '''
     daily task that indexes all Tweet objects from yesterday into AuxiliaryIndex
     '''
     # TODO: performance optimization
-    yesterday = datetime.date.fromordinal(datetime.date.today().toordinal() - 1)
-    indexed_tweets = Tweet.objects.index(created_at__gte=yesterday)
+    indexed_tweets = Tweet.objects.index(created_at__gte=from_date)
 
     for token, postings in indexed_tweets.items():
         postings_list = [Posting(document=Tweet.objects.get(id=doc_id), positions=pos)
