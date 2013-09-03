@@ -7,7 +7,7 @@ from query_processor import make_query_processor, QueryProcessor
 
 
 class DefaultTest(TestCase):
-    def setup(self):
+    def setUp(self):
         self.word1 = 'purple'
         self.freq1 = 1262
         self.word2 = 'colour'
