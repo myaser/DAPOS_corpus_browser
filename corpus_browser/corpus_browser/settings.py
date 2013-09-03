@@ -19,7 +19,8 @@ DATABASES = {
         'NAME': 'corpus.db',
     }
 }
-connect('corpus')
+MONGO_DATABASE_NAME = 'corpus'
+connect(MONGO_DATABASE_NAME)
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts

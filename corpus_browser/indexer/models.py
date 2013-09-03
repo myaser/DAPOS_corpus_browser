@@ -152,14 +152,4 @@ class AuxiliaryIndex(MainIndex):
                 index.objects.add_postings(obj.token, obj.postings)
         objs.delete()
 
-
-@change_collection(collection='test_Index')
-class TestIndex(AuxiliaryIndex):
-    pass
-
-
-@change_collection(collection='test_tweet')
-class TestTweet(Tweet):
-    pass
-
 # TODO: when tweet is deleted, remove from index

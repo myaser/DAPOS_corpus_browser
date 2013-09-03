@@ -22,8 +22,8 @@ def build_index():
 
 
 @periodic_task(run_every=crontab(day_of_week="6", hour="13"), enabled=True)
-def merge_index():
+def merge_index(sleep=5):
     '''
     weekly task that merges AuxiliaryIndex into MainIndex
     '''
-    AuxiliaryIndex.merge(MainIndex)
+    AuxiliaryIndex.merge(MainIndex, sleep=sleep)

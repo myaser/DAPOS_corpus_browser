@@ -1,7 +1,8 @@
 import os
 
 from corpus_browser.settings import PROJECT_ROOT
-from indexer.tests import TestTweet, MongoTestCase, TestIndex
+from indexer.models import AuxiliaryIndex
+from indexer.tests import MongoTestCase
 
 
 class TestIndexQuerySet(MongoTestCase):
@@ -9,10 +10,10 @@ class TestIndexQuerySet(MongoTestCase):
     def setUp(self):
         fixture_file = os.path.join(PROJECT_ROOT, 'indexer/fixtures/testindex.json')
         fixture = open(fixture_file).read()
-        TestIndex.load_data(fixture)
+        AuxiliaryIndex.load_data(fixture)
 
     def test_proximity(self):
-        TestIndex.objects.proximity(token__in=["@AlshakeroN", u"\u060c"])
+        AuxiliaryIndex.objects.proximity(token__in=["@AlshakeroN", u"\u060c"])
 
 
 
