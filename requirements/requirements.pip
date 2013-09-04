@@ -12,3 +12,4 @@ twython
 django-celery
 
 mongoengine
+nltk

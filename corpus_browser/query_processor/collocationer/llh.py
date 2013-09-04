@@ -1,11 +1,12 @@
 #! /usr/bin/python
 # -*- Coding:UTF-8 -*-
 
-from query_processor_strategy import QueryProcessorStrategy
 from math import log
 
+from query_processor.collocationer import Scorer
 
-class LogLikeliHood(QueryProcessorStrategy):
+
+class LogLikeliHood(Scorer):
 
     def calc(self, freq1, freq2, collocate_freq, corpus_size, span=6):
         self.freq1, self.freq2 = float(freq1), float(freq2)
