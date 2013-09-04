@@ -20,7 +20,6 @@ class DefaultTest(TestCase):
 class TestQueryProcessorCreator(TestCase):
 
     def setUp(self):
-        self.skipTest('error')
         TestCase.setUp(self)
 
     def test_make_loglikelihood(self):
@@ -51,7 +50,6 @@ class TestQueryProcessorCreator(TestCase):
 class TestLogLikelihood(DefaultTest):
 
     def setUp(self):
-        self.skipTest('error')
         TestCase.setUp(self)
 
     def test_method(self):
@@ -64,7 +62,7 @@ class TestLogLikelihood(DefaultTest):
                 14307668,
                 6
             ), 2),
-            1291.42
+            1291.32
         )
         self.assertEqual(
             round(make_query_processor('loglikelihood').calc(
@@ -74,7 +72,7 @@ class TestLogLikelihood(DefaultTest):
                 14307668,
                 6
             ), 2),
-            99.31
+            100.5
         )
         self.assertEqual(
             round(make_query_processor('loglikelihood').calc(
@@ -84,7 +82,7 @@ class TestLogLikelihood(DefaultTest):
                 14307668,
                 6
             ), 2),
-            82.96
+            82.38
         )
         self.assertEqual(
             round(make_query_processor('loglikelihood').calc(
@@ -94,7 +92,7 @@ class TestLogLikelihood(DefaultTest):
                 14307668,
                 6
             ), 2),
-            80.39
+            80.37
         )
         self.assertEqual(
             round(make_query_processor('loglikelihood').calc(
@@ -104,13 +102,12 @@ class TestLogLikelihood(DefaultTest):
                 14307668,
                 6
             ), 2),
-            57.27
+            57.29
         )
 
 class TestMutualInformation(DefaultTest):
 
     def setUp(self):
-        self.skipTest('error')
         TestCase.setUp(self)
     def test_method(self):
 
