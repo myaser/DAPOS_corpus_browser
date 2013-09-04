@@ -1,11 +1,11 @@
 #! /usr/bin/python
 # -*- Coding:UTF-8 -*-
 
-from query_processor_strategy import QueryProcessorStrategy
 from math import sqrt
+from query_processor.collocationer import Scorer
 
 
-class TTest(QueryProcessorStrategy):
+class TTest(Scorer):
     '''
          2.576 is the critical value for deviation = 005.
          So we cannot reject the null hypothesis if it less than it.
@@ -16,8 +16,8 @@ class TTest(QueryProcessorStrategy):
         self.corpus_size = float(corpus_size)
         self.span = span
 
-        return (self.sample_mean - self.mean ) /             \
-               sqrt(self.sample_variance/self.corpus_size)
+        return (self.sample_mean - self.mean) / \
+               sqrt(self.sample_variance / self.corpus_size)
 
     def posipility(self, freq):
         return freq / float(self.corpus_size)
