@@ -3,8 +3,24 @@ from nltk.probability import FreqDist
 
 class IndexFreqDist(FreqDist):
 
-    def __init__(self, samples=None):
-        raise NotImplementedError()
+    def __init__(self, index=None):
+        self.index = index
+
+    def __getitem__(self, sample):
+        if isinstance(sample, tuple):
+            return len(self.index.consequent(token__in=sample))  # it will work with ngrams but won't with collocations!
+        else:
+            return self.index.objects.get(token=sample).term_frequency or 0
+
+    def freq(self, sample):
+        N = self.N()
+        if N < 1:
+            return 0
+        return float(self[sample]) / N
+
+    def max(self):
+        max_token = self.index.objects.order_by("-term_frequency").first()
+        return (max_token.token, max_token.term_frequency)
 
     def inc(self, sample, count=1):
         raise NotImplementedError()
@@ -39,16 +55,6 @@ class IndexFreqDist(FreqDist):
 
     def _cumulative_frequencies(self, samples=None):
         raise NotImplementedError()
-
-    def freq(self, sample):
-        N = self.N()
-        if N < 1:
-            return 0
-        return float(self[sample]) / N
-
-    def max(self):
-        max_token = self.index.objects.order_by("-term_frequency").first()
-        return (max_token.token, max_token.term_frequency)
 
     def plot(self, *args, **kwargs):
         raise NotImplementedError()
@@ -119,5 +125,3 @@ class IndexFreqDist(FreqDist):
     def __str__(self):
         raise NotImplementedError()
 
-    def __getitem__(self, sample):
-        raise NotImplementedError()
