@@ -13,19 +13,26 @@ class IndexFreqDist(FreqDist):
         raise NotImplementedError()
 
     def N(self):
-        raise NotImplementedError()
+        return sum(map(lambda term: term.term_frequency, self.index.objects))
 
     def B(self):
-        raise NotImplementedError()
+        return self.index.objects.count()
 
     def samples(self):
         raise NotImplementedError()
 
     def hapaxes(self):
-        raise NotImplementedError()
+        return self.Nr(1)
 
     def Nr(self, r, bins=None):
-        raise NotImplementedError()
+        if r < 0: raise IndexError, 'FreqDist.Nr(): r must be non-negative'
+
+        # Special case for Nr(0):
+        if r == 0:
+            if bins is None: return 0
+            else: return bins-self.B()
+
+        return self.index.objects.get(term_frequency=r).count()
 
     def _cache_Nr_values(self):
         raise NotImplementedError()
@@ -34,10 +41,14 @@ class IndexFreqDist(FreqDist):
         raise NotImplementedError()
 
     def freq(self, sample):
-        raise NotImplementedError()
+        N = self.N()
+        if N < 1:
+            return 0
+        return float(self[sample]) / N
 
     def max(self):
-        raise NotImplementedError()
+        max_token = self.index.objects.order_by("-term_frequency").first()
+        return (max_token.token, max_token.term_frequency)
 
     def plot(self, *args, **kwargs):
         raise NotImplementedError()
