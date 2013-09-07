@@ -59,3 +59,7 @@ class IndexQuerySet(QuerySet):
                 if max(item) - min(item) <= window:
                     result.append(posting)
         return result
+
+    def consequent(self, *args, **kwargs):
+        # TODO:
+        return self.proximity(*args, **kwargs)

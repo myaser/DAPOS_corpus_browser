@@ -3,8 +3,20 @@ from nltk.probability import FreqDist
 
 class IndexFreqDist(FreqDist):
 
-    def __init__(self, samples=None):
-        raise NotImplementedError()
+    def __init__(self, index=None):
+        self.index = index
+
+    def __getitem__(self, sample):
+        if isinstance(sample, tuple):
+            return len(self.index.consequent(token__in=sample))
+        else:
+            return self.index.objects.get(token=sample).term_frequency or 0
+
+    def max(self):
+        pass
+
+    def freq(self, sample):
+        pass
 
     def inc(self, sample, count=1):
         raise NotImplementedError()
@@ -31,12 +43,6 @@ class IndexFreqDist(FreqDist):
         raise NotImplementedError()
 
     def _cumulative_frequencies(self, samples=None):
-        raise NotImplementedError()
-
-    def freq(self, sample):
-        raise NotImplementedError()
-
-    def max(self):
         raise NotImplementedError()
 
     def plot(self, *args, **kwargs):
@@ -108,5 +114,3 @@ class IndexFreqDist(FreqDist):
     def __str__(self):
         raise NotImplementedError()
 
-    def __getitem__(self, sample):
-        raise NotImplementedError()
