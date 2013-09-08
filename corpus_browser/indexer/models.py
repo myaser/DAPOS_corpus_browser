@@ -7,7 +7,7 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
 
 from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
-
+from utils import clear_cache
 
 class DocumentFixturesMixin(object):
 
@@ -151,5 +151,6 @@ class AuxiliaryIndex(MainIndex):
             for obj in obj_list:
                 index.objects.add_postings(obj.token, obj.postings)
         objs.delete()
+        clear_cache()
 
 # TODO: when tweet is deleted, remove from index
