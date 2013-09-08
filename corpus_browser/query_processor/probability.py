@@ -1,4 +1,7 @@
 from nltk.probability import FreqDist
+from django.core.cache import cache
+from utils.decorators import get_or_cache
+from django.utils.decorators import method_decorator
 
 
 class IndexFreqDist(FreqDist):
@@ -18,6 +21,7 @@ class IndexFreqDist(FreqDist):
             return 0
         return float(self[sample]) / N
 
+    @method_decorator(get_or_cache('max_value'))
     def max(self):
         max_token = self.index.objects.order_by("-term_frequency").first()
         return (max_token.token, max_token.term_frequency)
@@ -28,15 +32,18 @@ class IndexFreqDist(FreqDist):
     def __setitem__(self, sample, value):
         raise NotImplementedError()
 
+    @method_decorator(get_or_cache('corpus_size'))
     def N(self):
         return sum(map(lambda term: term.term_frequency, self.index.objects))
 
+    @method_decorator(get_or_cache('words_count'))
     def B(self):
         return self.index.objects.count()
 
     def samples(self):
         raise NotImplementedError()
 
+    @method_decorator(get_or_cache('hapaxes'))
     def hapaxes(self):
         return self.Nr(1)
 

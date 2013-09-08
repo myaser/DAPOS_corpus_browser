@@ -64,3 +64,8 @@ def change_collection(collection=None):
             return cls
         return new_class(collection)
     return wrap
+
+
+cache_keys = ['max_value', 'corpus_size', 'words_count', 'hapaxes']
+def clear_cache():
+    cache.delete_many(cache_keys)
