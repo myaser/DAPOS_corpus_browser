@@ -13,3 +13,5 @@ django-celery
 
 mongoengine
 nltk
+
+sympy
