@@ -3,6 +3,7 @@ from mongoengine import QuerySet
 import itertools
 from utils.decorators import get_or_cache
 from types import StringTypes
+from collections import Iterable
 
 
 class TweetsQuerySet(QuerySet):
@@ -49,16 +50,17 @@ class IndexQuerySet(QuerySet):
         '''
         return len(tokens_list)
 
-    def frequency(self, *tokens, window=None):
-        if len(tokens) == 1 and isinstance(tokens[0], StringTypes)
-            return self.get(token=token).term_frequency
+    def frequency(self, *tokens, **kwargs):
+        window = kwargs.get('window', None)
+        if len(tokens) == 1 and isinstance(tokens[0], StringTypes):
+            return self.get(token=tokens[0]).term_frequency
         else:
             tokens = self._collect_tokens(tokens)
             if window is None:
-                return _collect_freq(self.consequent(tokens))
+                return self._collect_freq(self.consequent(token__in=tokens))
             elif window == 0:
-                return self._collect_freq(self.intersect(tokens))
-            return _collect_freq(self.proximity(tokens, window=window))
+                return self._collect_freq(self.intersect(token__in=tokens))
+            return self._collect_freq(self.proximity(window=window, token__in=tokens))
 
     def intersect(self, *args, **kwargs):
         '''
@@ -79,11 +81,14 @@ class IndexQuerySet(QuerySet):
                         posting.positions.extend(_posting.positions)
         return list(result)
 
-    def proximity(self, window=1, *args, **kwargs):
+    def proximity(self, *args, **kwargs):
         '''
         do positional search and return documents that has all tokens of the
         query set near each other in window size
         '''
+        window = kwargs.get('window', 1)
+        if kwargs.get('window', None):
+            del kwargs['window']
         common = self.intersect(*args, **kwargs)
         result = []
         for posting in common:

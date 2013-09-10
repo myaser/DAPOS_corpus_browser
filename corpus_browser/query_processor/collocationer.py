@@ -37,18 +37,12 @@ class Collocationer(Operator):
 
     def extract_freq(self, w1, w2):
         freq1 = len(self.queryset)
-        freq2 = MainIndex.objects.frequancy(w2)
-        collocation_freq = MainIndex.objects.frequancy(w1,w2)
+        freq2 = MainIndex.objects.frequency(w2)
+        collocation_freq = MainIndex.objects.frequency(w1, w2, window=self.window)
 
-        return (collocation_freq, (freq1, freq2), MainIndex.objects.count_terms())
+        return (collocation_freq, (freq1, freq2), MainIndex.get_size())
 
-    def operate(self, queryset, tokens, scoring_algorithm, window=5):
-        self.queryset = queryset
-        self.scoring_fn = self.supported_scoring_algorithms.get(
-            scoring_algorithm
-        )
-        self.tokens = set(tokens)
-        self.other_tokens = self._other_tokens(queryset, window)
+    def collocations(self, tokens,other_tokens):
         return  [
                 (
                     (self.tokens, token),
@@ -58,6 +52,17 @@ class Collocationer(Operator):
                     )
                 ) for token in self.other_tokens
             ]
+
+    def operate(self, queryset, tokens, scoring_algorithm, window=5):
+        self.queryset = queryset
+        self.scoring_fn = self.supported_scoring_algorithms.get(
+            scoring_algorithm
+        )
+        self.window = window
+        self.tokens = set(tokens)
+        self.other_tokens = self._other_tokens(queryset, self.window)
+
+        return sorted(self.collocations(self.tokens, self.other_tokens), reverse=True, key=lambda item: item[1])
 
 
 class Concordance(Operator):
