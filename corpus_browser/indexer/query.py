@@ -1,6 +1,8 @@
 from utils import Counter
 from mongoengine import QuerySet
 import itertools
+from types import StringTypes
+from collections import Iterable
 
 
 class TweetsQuerySet(QuerySet):
@@ -28,13 +30,42 @@ class IndexQuerySet(QuerySet):
         index_entery.postings.extend(postings)
         index_entery.save()
 
+    def _collect_tokens(self, coll):
+        result = []
+        for item in coll:
+            if isinstance(item, StringTypes):
+                result.append(item)
+            elif isinstance(item, Iterable):
+                result += self._collect_tokens(item)
+            else:
+                raise ValueError('tokens should be string of collection of strings')
+        return result
+
+    def _collect_freq(self, tokens_list):
+        '''
+            simple implementation
+            results are aproximated not exact !
+            expected tokens_list: intersect or aproximity methods output !!
+        '''
+        return len(tokens_list)
+
+    def frequency(self, window=None, *tokens):
+        if len(tokens) == 1 and isinstance(tokens[0], StringTypes):
+            return self.get(token=tokens[0]).term_frequency
+        else:
+            tokens = self._collect_tokens(tokens)
+            if window is None:
+                return self._collect_freq(self.consequent(tokens))
+            elif window == 0:
+                return self._collect_freq(self.intersect(tokens))
+            return self._collect_freq(self.proximity(tokens, window=window))
+
     def intersect(self, token__in=[]):
         '''
         find documents that have all tokens of the query set.
         "AND boolean query"
         TODO: performance enhancement
         '''
-        # all tokens must be in the index TODO:
 
         self = self.filter(token__in=token__in).order_by()
 

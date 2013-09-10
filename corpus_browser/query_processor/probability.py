@@ -57,7 +57,8 @@ class ELEEstimator(LidstoneEstimator):  # expected likelihood k=0.5
 
 
 class UnigramPriorEstimator(Estimator):
-    pass
+    def __call__(self, token=None, history=None):
+        Estimator.__call__(self, token=token, history=history)
 
 
 class WittenBellEstimator(Estimator):  # wittenbell estimate

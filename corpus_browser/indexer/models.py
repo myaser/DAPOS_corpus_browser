@@ -7,7 +7,7 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
 
 from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
-
+from utils import clear_cache
 
 class DocumentFixturesMixin(object):
 
@@ -109,6 +109,16 @@ class MainIndex(Document, DocumentFixturesMixin):
     def document_frequency(self):
         return len(self.postings)
 
+    @classmethod
+    @get_or_cache('corpus_size')
+    def get_size(self):
+        return self.objects.sum('term_frequency')
+
+    @classmethod
+    @get_or_cache('tokens_count')
+    def get_tokens_count(self):
+        return self.objects.count()
+
     @property
     def target_documents(self):
         return [posting.document for posting in self.postings]
@@ -161,5 +171,6 @@ class AuxiliaryIndex(MainIndex):
             for obj in obj_list:
                 index.objects.add_postings(obj.token, obj.postings)
         objs.delete()
+        clear_cache()
 
 # TODO: when tweet is deleted, remove from index
