@@ -60,25 +60,6 @@ class UnigramPriorEstimator(Estimator):
     def __call__(self, token=None, history=None):
         Estimator.__call__(self, token=token, history=history)
 
-
-class WittenBellEstimator(Estimator):  # wittenbell estimate
-    def __init__(self):
-        self.prob_0 = float(self.num_tokens) / self.num_tokens + self.index_size
-
-    def __call__(self, token=None, history=None):
-        raise NotImplementedError()
-
-
-class GoodTuringEstimator(Estimator):
-    def __init__(self):
-        raise NotImplementedError()
-
-
-class SimpleGoodTuringEstimator(Estimator):
-    def __init__(self):
-        raise NotImplementedError()
-
-
 # from query_processor.ngram import NGram
 # from query_processor.probability import *
 # from indexer.models import *

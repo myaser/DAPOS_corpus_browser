@@ -97,5 +97,16 @@ class IndexQuerySet(QuerySet):
         return result
 
     def consequent(self, token__in=[]):
-        # TODO:
-        return self.proximity(token__in=token__in)
+        common = self.intersect(token__in=token__in)
+        num_tokens = len(token__in)
+        result = []
+        for posting in common:
+            pos = dict(posting.positions)
+            positions_lists = [pos[token] for token in token__in]
+
+            for item in itertools.product(*positions_lists):
+                start = item[0]
+
+                if item == tuple(range(start, start + num_tokens)):
+                    result.append(posting)
+        return result

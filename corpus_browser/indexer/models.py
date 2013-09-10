@@ -8,6 +8,7 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
 from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
 from utils import clear_cache
+from utils.decorators import get_or_cache
 
 class DocumentFixturesMixin(object):
 
@@ -129,16 +130,6 @@ class MainIndex(Document, DocumentFixturesMixin):
         for document in result:
             document.positions = [(self.token, document.positions)]
         return result
-
-    @classmethod
-    def get_index_size(cls):
-        # TODO: needs caching
-        return sum([obj.term_frequency for obj in cls.objects])
-
-    @classmethod
-    def get_tokens_count(cls):
-        # TODO: needs caching
-        return cls.objects.count()
 
     def __unicode__(self):
         return document_repr(self)
