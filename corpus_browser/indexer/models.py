@@ -109,6 +109,16 @@ class MainIndex(Document, DocumentFixturesMixin):
     def document_frequency(self):
         return len(self.postings)
 
+    @classmethod
+    @get_or_cache('corpus_size')
+    def get_size(self):
+        return self.objects.sum('term_frequency')
+
+    @classmethod
+    @get_or_cache('tokens_count')
+    def get_tokens_count(self):
+        return self.objects.count()
+
     @property
     def target_documents(self):
         return [posting.document for posting in self.postings]

@@ -2,6 +2,7 @@ from collections import Counter as StandardCounter
 from _abcoll import Mapping
 from django.forms.models import model_to_dict
 from timeit import itertools
+from django.core.cache import cache
 
 
 class Counter(StandardCounter):
@@ -66,6 +67,6 @@ def change_collection(collection=None):
     return wrap
 
 
-cache_keys = ['max_value', 'corpus_size', 'words_count', 'hapaxes']
+cache_keys = ['max_value', 'corpus_size', 'tokens_count', 'hapaxes']
 def clear_cache():
     cache.delete_many(cache_keys)
