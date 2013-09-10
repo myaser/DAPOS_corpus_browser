@@ -2,22 +2,7 @@ from nltk.collocations import BigramAssocMeasures, BigramCollocationFinder
 from collections import Iterable
 from types import StringTypes
 from indexer.models import MainIndex
-
-class Operator(object):
-    '''
-    operator executed after query to do(concordance,OR collocation,OR N-gram)
-    '''
-
-    @classmethod
-    def from_str(cls, operator):
-        return {
-            'collocation': Collocationer,
-            'concordance': Concordance,
-            'ngram': Ngram,
-        }.get(operator)()
-
-    def operate(self):
-        raise NotImplementedError()
+from operator import Operator
 
 
 class Collocationer(Operator):
@@ -63,11 +48,3 @@ class Collocationer(Operator):
         self.other_tokens = self._other_tokens(queryset, self.window)
 
         return sorted(self.collocations(self.tokens, self.other_tokens), reverse=True, key=lambda item: item[1])
-
-
-class Concordance(Operator):
-    pass
-
-
-class Ngram(Operator):
-    pass
