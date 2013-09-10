@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
-
+from django.utils.decorators import method_decorator
+from utils.decorators import get_or_cache
 
 from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
                  IntField, ListField, ReferenceField, EmbeddedDocumentField)
@@ -112,13 +113,13 @@ class MainIndex(Document, DocumentFixturesMixin):
 
     @classmethod
     @get_or_cache('corpus_size')
-    def get_size(self):
-        return self.objects.sum('term_frequency')
+    def get_size(cls):
+        return cls.objects.sum('term_frequency')
 
     @classmethod
     @get_or_cache('tokens_count')
-    def get_tokens_count(self):
-        return self.objects.count()
+    def get_tokens_count(cls):
+        return cls.objects.count()
 
     @property
     def target_documents(self):

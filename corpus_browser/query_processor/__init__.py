@@ -4,7 +4,6 @@
 
 from indexer.models import MainIndex
 from utils.string_processor import split_unicode
-from .collocationer import Operator
 import re
 
 
@@ -14,7 +13,7 @@ class QueryProcessor(object):
         self.search_phrase = search_phrase
         if operator is None:
             raise ValueError('operator should be given!')
-        self.operator = Operator.from_str(operator)
+        self.operator = operator
         self.parse_search()
 
     def parse_search(self):
@@ -59,5 +58,6 @@ class QueryProcessor(object):
 
 
 def usage_example():
-    q = QueryProcessor(u'الله اكبر', 'collocation')
+    from collocationer import Collocationer
+    q = QueryProcessor(u'الله اكبر', Collocationer())
     print q.excute_query('log_likelihood')

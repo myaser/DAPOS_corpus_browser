@@ -49,16 +49,17 @@ class IndexQuerySet(QuerySet):
         '''
         return len(tokens_list)
 
-    def frequency(self, window=None, *tokens):
+    def frequency(self, *tokens, **kwargs):
+        window = kwargs.pop('window', None)
         if len(tokens) == 1 and isinstance(tokens[0], StringTypes):
             return self.get(token=tokens[0]).term_frequency
         else:
             tokens = self._collect_tokens(tokens)
             if window is None:
-                return self._collect_freq(self.consequent(tokens))
+                return self._collect_freq(self.consequent(token__in=tokens))
             elif window == 0:
-                return self._collect_freq(self.intersect(tokens))
-            return self._collect_freq(self.proximity(tokens, window=window))
+                return self._collect_freq(self.intersect(token__in=tokens))
+            return self._collect_freq(self.proximity(window=window, token__in=tokens))
 
     def intersect(self, token__in=[]):
         '''

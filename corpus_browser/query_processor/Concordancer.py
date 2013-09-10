@@ -1,4 +1,4 @@
-from query_processor import Operator
+from operator import Operator
 
 
 class Concordancer(Operator):
