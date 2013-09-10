@@ -120,6 +120,16 @@ class MainIndex(Document, DocumentFixturesMixin):
             document.positions = [(self.token, document.positions)]
         return result
 
+    @classmethod
+    def get_index_size(cls):
+        # TODO: needs caching
+        return sum([obj.term_frequency for obj in cls.objects])
+
+    @classmethod
+    def get_tokens_count(cls):
+        # TODO: needs caching
+        return cls.objects.count()
+
     def __unicode__(self):
         return document_repr(self)
 

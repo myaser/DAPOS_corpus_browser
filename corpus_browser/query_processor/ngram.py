@@ -14,8 +14,6 @@ class NGram():
         for i in range(len(statement) - 1, -1, -1):
             token = statement[i]
             if i < self._k:
-                # heading empty strings
-#                 history = [''] * (self._k - i) + statement[:i]
                 history = statement[:i]
             else:
                 history = statement[i - self._k: i]

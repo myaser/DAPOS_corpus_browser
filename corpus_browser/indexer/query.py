@@ -28,13 +28,18 @@ class IndexQuerySet(QuerySet):
         index_entery.postings.extend(postings)
         index_entery.save()
 
-    def intersect(self, *args, **kwargs):
+    def intersect(self, token__in=[]):
         '''
         find documents that have all tokens of the query set.
         "AND boolean query"
         TODO: performance enhancement
         '''
-        self = self.filter(*args, **kwargs).order_by()
+        # all tokens must be in the index TODO:
+
+        self = self.filter(token__in=token__in).order_by()
+
+        if not self or len(self) != len(token__in):
+            return []
 
         self = [index.as_result for index in self]
         result, remaining = set(self[0]), self[1:]
@@ -46,12 +51,12 @@ class IndexQuerySet(QuerySet):
                         posting.positions.extend(_posting.positions)
         return list(result)
 
-    def proximity(self, window=1, *args, **kwargs):
+    def proximity(self, window=1, token__in=[]):
         '''
         do positional search and return documents that has all tokens of the
         query set near each other in window size
         '''
-        common = self.intersect(*args, **kwargs)
+        common = self.intersect(token__in=token__in)
         result = []
         for posting in common:
             positions_lists = zip(*posting.positions)[1]
@@ -60,6 +65,6 @@ class IndexQuerySet(QuerySet):
                     result.append(posting)
         return result
 
-    def consequent(self, *args, **kwargs):
+    def consequent(self, token__in=[]):
         # TODO:
-        return self.proximity(*args, **kwargs)
+        return self.proximity(token__in=token__in)
