@@ -2,9 +2,20 @@ from utils.string_processor import split_unicode
 import re
 
 
+class Operator():
+    def set_index(self, index):
+        self.index = index
+
+    def operate(self, queryset, tokens):
+        '''
+        do nothing
+        '''
+        return queryset, tokens
+
+
 class QueryProcessor(object):
 
-    def __init__(self, index, search_phrase='', operator=None):
+    def __init__(self, index, search_phrase='', operator=Operator):
         self.search_phrase = search_phrase
         self.index = index
 
@@ -59,14 +70,3 @@ class QueryProcessor(object):
         do post query processing according to `self.operator`
         '''
         return self.operator.operate(self.query_result, self.tokens)
-
-
-class Operator():
-    def set_index(self, index):
-        self.index = index
-
-    def operate(self, queryset, tokens):
-        '''
-        do nothing
-        '''
-        return queryset, tokens

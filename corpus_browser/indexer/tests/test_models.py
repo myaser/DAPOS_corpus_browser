@@ -2,9 +2,9 @@ import os
 
 from corpus_browser.settings import PROJECT_ROOT
 
-from indexer.models import Posting, Tweet, MainIndex, AuxiliaryIndex
+from indexer.models import Posting, Tweet, AuxiliaryIndex
 
-from indexer.tests import MongoTestCase
+from utils.tests import MongoTestCase
 
 
 class FixturesTest(MongoTestCase):
@@ -94,3 +94,6 @@ class IndexTest(MongoTestCase):
         self.assertEqual(index_object.term_frequency, 3)
         self.assertEqual(index_object.postings,
                          [Posting(document=_document, positions=[1, 2, 3])])
+
+    def test_size(self):
+        pass

@@ -4,7 +4,7 @@ import os
 from corpus_browser.settings import PROJECT_ROOT
 from indexer.models import MainIndex, AuxiliaryIndex, Tweet
 from indexer.tasks import merge_index, build_index
-from indexer.tests import MongoTestCase
+from utils.tests import MongoTestCase
 import datetime
 
 

@@ -2,7 +2,7 @@ import os
 
 from corpus_browser.settings import PROJECT_ROOT
 from indexer.models import AuxiliaryIndex
-from indexer.tests import MongoTestCase
+from utils.tests import MongoTestCase
 
 
 class TestIndexQuerySet(MongoTestCase):
@@ -67,3 +67,7 @@ class TestIndexQuerySet(MongoTestCase):
     def test_consequent(self):
         # TODO:
         pass
+
+    def test_frequency(self):
+        pass
+
