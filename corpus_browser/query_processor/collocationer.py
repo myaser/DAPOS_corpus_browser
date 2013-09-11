@@ -1,9 +1,5 @@
-from nltk.collocations import BigramAssocMeasures, BigramCollocationFinder
-from collections import Iterable
-from types import StringTypes
-from indexer.models import MainIndex
-from operator import Operator
-
+from nltk.collocations import BigramAssocMeasures
+from query_processor import Operator
 
 
 class Collocationer(Operator):
@@ -14,6 +10,10 @@ class Collocationer(Operator):
     'log_likelihood': BigramAssocMeasures.likelihood_ratio,
     }
 
+    def __init__(self, scoring_algorithm, window=5):
+        self.scoring_algorithm = scoring_algorithm
+        self.window = window
+
     def _other_tokens(self, queryset, window):
         documents = map(lambda posing: posing.document, queryset)
         other_tokens = set([])
@@ -23,12 +23,12 @@ class Collocationer(Operator):
 
     def extract_freq(self, w1, w2):
         freq1 = len(self.queryset)
-        freq2 = MainIndex.objects.frequency(w2)
-        collocation_freq = MainIndex.objects.frequency(w1, w2, window=self.window)
+        freq2 = self.index.objects.frequency(w2)
+        collocation_freq = self.index.objects.frequency(w1, w2, window=self.window)
 
-        return (collocation_freq, (freq1, freq2), MainIndex.get_size())
+        return (collocation_freq, (freq1, freq2), self.index.get_size())
 
-    def collocations(self, tokens,other_tokens):
+    def collocations(self, tokens, other_tokens):
         return  [
                 (
                     (self.tokens, token),
@@ -39,13 +39,12 @@ class Collocationer(Operator):
                 ) for token in self.other_tokens
             ]
 
-    def operate(self, queryset, tokens, scoring_algorithm, window=5):
+    def operate(self, queryset, tokens):
         self.queryset = queryset
         self.scoring_fn = self.supported_scoring_algorithms.get(
-            scoring_algorithm
-        )
-        self.window = window
+                                                    self.scoring_algorithm)
         self.tokens = set(tokens)
-        self.other_tokens = self._other_tokens(queryset, self.window)
+        self.other_tokens = self._other_tokens(self.queryset, self.window)
 
-        return sorted(self.collocations(self.tokens, self.other_tokens), reverse=True, key=lambda item: item[1])
+        return sorted(self.collocations(self.tokens, self.other_tokens),
+                      reverse=True, key=lambda item: item[1])

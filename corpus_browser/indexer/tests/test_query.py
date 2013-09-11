@@ -63,3 +63,7 @@ class TestIndexQuerySet(MongoTestCase):
             token__in=[self.token1, self.token3]
         )
         self.assertFalse(bool(result3))
+
+    def test_consequent(self):
+        # TODO:
+        pass

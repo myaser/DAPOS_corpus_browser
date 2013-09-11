@@ -1,49 +1,53 @@
 
 
 class Estimator():
-    # TODO: avoid underflow
 
     def __call__(self, token=None, history=None):
         raise NotImplementedError()
 
     def set_index(self, index):
         self.index = index
-        self.index_size = index.get_index_size()
+        self.index_size = index.get_size()
         self.num_tokens = index.get_tokens_count()
-
-    def _get_count(self, counted):
-        # we are counting documents not occurance in documents TODO: FIXME:
-        if isinstance(counted, str):
-            return self.index.objects.get(token=counted).term_frequency
-        else:
-            assert isinstance(counted, list)  # defensive programming
-            if not counted:
-                # count every thing
-                return self.index_size
-            elif len(counted) == 1:
-                return self.index.objects.get(token=counted[0]).term_frequency
-            else:
-                return len(self.index.objects.consequent(token__in=counted))
 
 
 class MLEEstimator(Estimator):  # maximum likelihood
     def __call__(self, token=None, history=None):
-        count_history = self._get_count(history)
 
-        joint_count = self._get_count(history + [token])
+        if not history:
+            history_count = self.index_size
+        else:
+            history_count = self.index.objects.frequency(history)
+
+        joint_count = self.index.objects.frequency(history + [token])
         try:
-            prob = joint_count / float(count_history)
+            prob = self._prob(joint_count, history_count)
         except ZeroDivisionError:  # MLE can't estimate unknown tokens
             prob = 0.0
         return prob
 
+    def _prob(self, joint_count, history_count):
+        return joint_count / float(history_count)
+
 
 class LidstoneEstimator(Estimator):  # add k smoothing
-    def __init__(self, k):
+    def __init__(self, k=1):
         self._k = k
 
     def __call__(self, token=None, history=None):
-        raise NotImplementedError()
+
+        if not history:
+            history_count = self.index_size
+        else:
+            history_count = self.index.objects.frequency(history)
+
+        joint_count = self.index.objects.frequency(history + [token])
+
+        return self._prob(joint_count, history_count)
+
+    def _prob(self, joint_count, history_count):
+        return (joint_count + self._k) / float(
+                                       history_count + self.index_size)
 
 
 class LaplaceEstimator(LidstoneEstimator):  # add one smoothing k=1
@@ -56,9 +60,14 @@ class ELEEstimator(LidstoneEstimator):  # expected likelihood k=0.5
         LidstoneEstimator.__init__(self, 0.5)
 
 
-class UnigramPriorEstimator(Estimator):
+class UnigramPriorEstimator(LidstoneEstimator):
+
     def __call__(self, token=None, history=None):
-        Estimator.__call__(self, token=token, history=history)
+        self.prior = self.index.objects.frequency(token) / float(self.index_size)
+        return LidstoneEstimator.__call__(self, token=token, history=history)
+
+    def _prob(self, joint_count, history_count):
+        return (joint_count + self._k * self.prior) / float(history_count + self._k)
 
 # from query_processor.ngram import NGram
 # from query_processor.probability import *

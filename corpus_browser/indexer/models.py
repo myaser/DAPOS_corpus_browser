@@ -1,6 +1,5 @@
 import time
 from datetime import datetime
-from django.utils.decorators import method_decorator
 from utils.decorators import get_or_cache
 
 from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
@@ -9,7 +8,7 @@ from mongoengine import (Document, EmbeddedDocument, DateTimeField, StringField,
 from utils import document_repr, change_collection
 from indexer.query import TweetsQuerySet, IndexQuerySet
 from utils import clear_cache
-from utils.decorators import get_or_cache
+
 
 class DocumentFixturesMixin(object):
 
