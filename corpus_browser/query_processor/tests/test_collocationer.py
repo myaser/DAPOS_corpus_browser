@@ -38,6 +38,7 @@ class TestCollocationer(MongoTestCase):
             tokens)
 
     def test_extract_freq(self):
+        self.collocationer.window = 0
         freqs = self.collocationer.extract_freq(self.tokens, u'خوف', self.queryset)
         self.assertEqual((1, (1, 1), 7222.0), freqs)
 

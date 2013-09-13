@@ -15,7 +15,7 @@ class Operator():
 
 class QueryProcessor(object):
 
-    def __init__(self, index, search_phrase='', operator=Operator):
+    def __init__(self, index, search_phrase='', operator=Operator()):
         self.search_phrase = search_phrase
         self.index = index
 
@@ -35,17 +35,20 @@ class QueryProcessor(object):
         if self.search_phrase.startswith(('"', "'")) and self.search_phrase.endswith(('"',"'")):
             self.query_type = 'phrase'
             self.tokens = split_unicode(self.search_phrase[1:-1])
+            self.window = None
 
         # proximity search
-        elif re.search('\\\d+$', self.search_phrase):
+        elif re.search(r'\\\d+$', self.search_phrase):
             self.query_type = 'proximity'
-            self.phrase, self.proximity, _ = re.split(r'\\\d+$', self.search_phrase)
+            self.phrase, self.window, _ = re.split(r'\\(\d+)$', self.search_phrase)
+            self.window = int(self.window)
             self.tokens = split_unicode(self.phrase)
 
         # boolean search
         else:
             self.query_type = 'boolean'
             self.tokens = split_unicode(self.search_phrase)
+            self.window = 0
 
     def excute_query(self):
         '''
@@ -58,7 +61,7 @@ class QueryProcessor(object):
         elif self.query_type == 'proximity':
             self.query_result = self.index.objects.proximity(
                                                       token__in=self.tokens,
-                                                      window=self.proximity)
+                                                      window=self.window)
 
         elif self.query_type == 'boolean':
             self.query_result = self.index.objects.intersect(
@@ -69,4 +72,4 @@ class QueryProcessor(object):
         '''
         do post query processing according to `self.operator`
         '''
-        return self.operator.operate(self.query_result, self.tokens)
+        return self.operator.operate(self.query_result, self.tokens, self.window)

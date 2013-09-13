@@ -2,6 +2,10 @@ from nltk.collocations import BigramAssocMeasures
 from query_processor import Operator
 
 
+import logging
+logger = logging.getLogger()
+
+
 class Collocationer(Operator):
 
     supported_scoring_algorithms = {
@@ -10,11 +14,10 @@ class Collocationer(Operator):
     'log_likelihood': BigramAssocMeasures.likelihood_ratio,
     }
 
-    def __init__(self, scoring_algorithm, window=5):
+    def __init__(self, scoring_algorithm):
         self.scoring_algorithm = scoring_algorithm
         self.scoring_fn = self.supported_scoring_algorithms.get(
                                                     self.scoring_algorithm)
-        self.window = window
 
     def _other_tokens(self, queryset, tokens, window):
         documents = map(lambda posing: posing.document, queryset)
@@ -30,22 +33,38 @@ class Collocationer(Operator):
 
         return (collocation_freq, (freq1, freq2), self.index.get_size())
 
-    def collocations(self, tokens, other_tokens):
+    def calc_score(self, tokens, other_token, queryset):
+        try:
+            return self.scoring_fn(*self.extract_freq(
+                tokens,
+                other_token,
+                queryset
+            ))
+        except ValueError:
+            logger.error('unable to calculate scoring algorithm %{0},'
+                ' with requencies %{1}.'.format(
+                    self.scoring_algorithm,
+                    self.extract_freq(tokens, other_token, queryset)
+                ))
+            return 0
+
+    def collocations(self, tokens, other_tokens, queryset):
         return  [
                 (
-                    (self.tokens, token),
-                        self.scoring_fn(*self.extract_freq(
-                        self.tokens,
-                        token,
-                        self.queryset)
-                    )
-                ) for token in self.other_tokens
+                    (tokens, token),
+                        self.calc_score(
+                            tokens,
+                            token,
+                            queryset
+                        )
+                ) for token in other_tokens
             ]
 
-    def operate(self, queryset, tokens):
+    def operate(self, queryset, tokens, window=5):
         self.queryset = queryset
         self.tokens = set(tokens)
+        self.window = window
         self.other_tokens = self._other_tokens(self.queryset, self.tokens, self.window)
 
-        return sorted(self.collocations(self.tokens, self.other_tokens),
+        return sorted(self.collocations(self.tokens, self.other_tokens, self.queryset),
                       reverse=True, key=lambda item: item[1])
