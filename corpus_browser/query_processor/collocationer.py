@@ -60,7 +60,7 @@ class Collocationer(Operator):
                 ) for token in other_tokens
             ]
 
-    def operate(self, queryset, tokens, window=5):
+    def operate(self, queryset, tokens, window=5, *args, **kwargs):
         self.queryset = queryset
         self.tokens = set(tokens)
         self.window = window

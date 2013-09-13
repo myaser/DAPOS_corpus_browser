@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <table border="0">
+        <tr>
+            <td>Word1</td>
+            <td>Word2</td>
+            <td>Collocation</td>
+        </tr>
+        {% for ((word1, word2), calc) in collocations %}
+            <tr>
+            aasdfa
+                <td>{% for term in word1 %}
+                        term: {{term}}
+                    {% endfor %}
+                </td>
+                <td>term2 {{ word2 }}</td>
+                <td>calc {{ calc }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
