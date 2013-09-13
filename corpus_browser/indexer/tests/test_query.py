@@ -1,3 +1,7 @@
+#!/usr/bin/python
+# -*- coding:UTF-8 -*-
+
+
 import os
 
 from corpus_browser.settings import PROJECT_ROOT
@@ -69,5 +73,20 @@ class TestIndexQuerySet(MongoTestCase):
         pass
 
     def test_frequency(self):
-        pass
+        freq1 = AuxiliaryIndex.objects.frequency(u'الله')
+        self.assertEqual(3, freq1)
+
+        freq2 = AuxiliaryIndex.objects.frequency(u'الله', u'كبير', window=0)
+        self.assertEqual(1, freq2)
+
+        freq3 = AuxiliaryIndex.objects.frequency(u'مصر', u'الإخوان')
+        self.assertEqual(0, freq3)
+        freq3 = AuxiliaryIndex.objects.frequency((u'مصر', u'الإخوان'), u'حرق', window=0)
+        self.assertEqual(1, freq3)
+        freq4 = AuxiliaryIndex.objects.frequency(u'مصر', u'الإخوان', window=0)
+        self.assertEqual(3, freq4)
+        freq5 = AuxiliaryIndex.objects.frequency(u'مصر', u'الإخوان', window=5)
+        self.assertEqual(1, freq5)
+        freq6 = AuxiliaryIndex.objects.frequency(u'مصر', u'الإخوان', window=3)
+        self.assertEqual(0, freq6)
 
