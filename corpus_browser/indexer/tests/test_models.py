@@ -96,4 +96,8 @@ class IndexTest(MongoTestCase):
                          [Posting(document=_document, positions=[1, 2, 3])])
 
     def test_size(self):
-        pass
+        tokens_count = AuxiliaryIndex.get_tokens_count()
+        self.assertEqual(4338, tokens_count)
+
+        corpus_size = AuxiliaryIndex.get_size()
+        self.assertEqual(7222, corpus_size)
