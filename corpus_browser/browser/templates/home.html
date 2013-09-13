@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">DAPOS</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="#">Home</a>
+                </li>
+                <li>
+                    <a href="#about">About</a>
+                </li>
+                <li>
+                    <a href="#contact">Contact</a>
+                </li>
+            </ul>
+        </div><!--/.navbar-collapse -->
+    </div>
+</div>
+
+<form class="form-inline" action="{% url 'search' %}" method="get" name="search">
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <div class="col-lg-2"></div>
+            <div class="form-group col-lg-8">
+                <input type="search" class="form-control input-lg" name="search_phrase">
+            </div>
+            <button type="submit" class="btn btn-default btn-lg btn-primary" id="search">
+                Search
+            </button>
+            <!-- </form> -->
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+                <div class="col-lg-4 well form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="process" value="concordance" checked>
+                            concordance </label>
+                    </div>
+                </div>
+                <div class="col-lg-4 local-well form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="process" value="collocationes">
+                            collocations </label>
+                    </div>
+
+                    <select class="form-control" name="collocation_algorithm">
+                         <option value="None">choose ...</option>
+                         <option value="mutual-information">mutual information</option>
+                         <option value="log-likelihood">log likelihood</option>
+                         <option value="t-score">t-score</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 well form-group">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="process" value="NGram">
+                            ngram </label>
+                    </div>
+                    
+                    <div>
+                    <input type="number" name="ngram_size" value="2">
+                    </div>
+                    <select class="form-control" name="ngram_estimator">
+                         <option value="None">choose ...</option>
+                         <option value="MLEEstimator">maximum likelihood</option>
+                         <option value="LidstoneEstimator">add k smoothing</option>
+                         <option value="LaplaceEstimator">add one smoothing</option>
+                         <option value="ELEEstimator">expected estimation</option>
+                         <option value="UnigramPriorEstimator">unigram prior</option>
+                    </select>
+                </div>
+                <!-- </form> -->
+        </div>
+        <hr>
+
+        <!-- <footer>
+        <p>
+        &copy; Company 2013
+        </p>
+        </footer> -->
+    </div>
+</form>
+{% endblock %}

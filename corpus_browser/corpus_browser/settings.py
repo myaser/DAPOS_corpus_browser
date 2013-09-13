@@ -125,7 +125,8 @@ TEST_RUNNER = 'discover_runner.DiscoverRunner'
 
 LOCAL_APPS = (
     'scrapper',
-    'indexer',
+    'browser',
+#     'indexer',
 )
 
 INSTALLED_APPS = (
