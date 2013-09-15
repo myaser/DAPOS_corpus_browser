@@ -25,5 +25,5 @@ class NGram(Operator):
                                      history=history)
         return result
 
-    def operate(self, query_result, tokens):
+    def operate(self, query_result, tokens, *args, **kwargs):
         return self.prob(tokens)

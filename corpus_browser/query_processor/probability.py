@@ -69,6 +69,14 @@ class UnigramPriorEstimator(LidstoneEstimator):
     def _prob(self, joint_count, history_count):
         return (joint_count + self._k * self.prior) / float(history_count + self._k)
 
+
+def make_ngram_estimator(estimator):
+    return {"MLEEstimator": MLEEstimator,
+    "LidstoneEstimator": LidstoneEstimator,
+    "LaplaceEstimator": LaplaceEstimator,
+    "ELEEstimator": ELEEstimator,
+    "UnigramPriorEstimator": UnigramPriorEstimator,}.get(estimator)
+
 # from query_processor.ngram import NGram
 # from query_processor.probability import *
 # from indexer.models import *

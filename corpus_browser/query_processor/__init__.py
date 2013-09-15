@@ -6,7 +6,7 @@ class Operator():
     def set_index(self, index):
         self.index = index
 
-    def operate(self, queryset, tokens):
+    def operate(self, queryset, tokens, *args, **kwargs):
         '''
         do nothing
         '''
