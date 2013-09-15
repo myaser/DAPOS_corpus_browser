@@ -61,6 +61,27 @@ class IndexQuerySet(QuerySet):
                 return self._collect_freq(self.intersect(token__in=tokens))
             return self._collect_freq(self.proximity(window=window, token__in=tokens))
 
+#     def intersect(self, token__in=[]):
+#         '''
+#         find documents that have all tokens of the query set.
+#         "AND boolean query"
+#         TODO: performance enhancement
+#         '''
+# 
+#         self = self.filter(token__in=token__in).order_by()
+# 
+#         if not self or len(self) != len(token__in):
+#             return []
+# 
+#         self = [index.as_result for index in self]
+#         result, remaining = set(self[0]), self[1:]
+# 
+#         result = result.intersection(*remaining)
+#         for posting in result:
+#             for _posting in list(itertools.chain.from_iterable(self)):
+#                     if posting == _posting:
+#                         posting.positions.extend(_posting.positions)
+#         return list(result)
     def intersect(self, token__in=[]):
         '''
         find documents that have all tokens of the query set.
@@ -68,17 +89,17 @@ class IndexQuerySet(QuerySet):
         TODO: performance enhancement
         '''
 
-        self = self.filter(token__in=token__in).order_by()
+        queryset = self.filter(token__in=token__in).order_by()
 
-        if not self or len(self) != len(token__in):
+        if not queryset or len(queryset) != len(token__in):
             return []
 
-        self = [index.as_result for index in self]
-        result, remaining = set(self[0]), self[1:]
+        common = [index.as_result for index in queryset]
+        result, remaining = set(common[0]), common[1:]
 
         result = result.intersection(*remaining)
         for posting in result:
-            for _posting in list(itertools.chain.from_iterable(self)):
+            for _posting in list(itertools.chain.from_iterable(common)):
                     if posting == _posting:
                         posting.positions.extend(_posting.positions)
         return list(result)
