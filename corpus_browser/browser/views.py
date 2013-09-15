@@ -8,7 +8,9 @@ from indexer.models import MainIndex
 
 
 def main(request):
-    return render(request, 'home.html', {'title': 'DAPOS'})
+    context = request.GET.dict()
+    context.update({'title': 'DAPOS'})
+    return render(request, 'home.html', context)
 
 
 def _collocation(request):
@@ -16,11 +18,15 @@ def _collocation(request):
     scoring_algorithm = request.GET['collocation_algorithm']
     q = QueryProcessor(MainIndex, search_phrase, Collocationer(scoring_algorithm))
     collocations = q.excute_query()
+    context = request.GET.dict()
+    context.update({'title': 'Collocation', 'collocations': collocations,
+            'tokens': ' '.join(q.tokens), 'algorithm': scoring_algorithm})
+
+    print context
 
     return render(request,
            'collocation.html',
-           {'title': 'Collocation', 'collocations': collocations,
-            'tokens': ' '.join(q.tokens), 'algorithm': scoring_algorithm}
+           context
         )
 
 
@@ -32,9 +38,13 @@ def _ngram(request):
     q = QueryProcessor(MainIndex, search_phrase, NGram(ngram_size, estimator))
     ngrams = q.excute_query()
 
+    context = request.GET.dict()
+    context.update({'title': 'NGrams',
+                    'ngrams': ngrams,
+                    'search_phrase': search_phrase})
     return render(request,
             'ngrams.html',
-            {'title': 'NGrams', 'ngrams': ngrams, 'search_phrase': search_phrase}
+            context
         )
 
 
@@ -43,19 +53,19 @@ def _concordance(request):
 
     q = QueryProcessor(MainIndex, search_phrase)
     results, tokens = q.excute_query()
-
-    return render(request,
-                  'concordance.html',
-                  {'title': 'Concordance',
+    context = request.GET.dict()
+    context.update({'title': 'Concordance',
                    'results':results,
                    'tokens': tokens,
-                   'search_phrase': search_phrase}
+                   'search_phrase': search_phrase})
+    return render(request,
+                  'concordance.html',
+                  context
                 )
 
 
 def _extract_process_type(request):
     try:
-        print "here !"
         process = request.GET['process']
         return {
             'collocations': _collocation,
@@ -69,8 +79,5 @@ def _extract_process_type(request):
 
 def search(request):
     process_func = _extract_process_type(request)
-    # try:
+    
     return process_func(request)
-    # except KeyError:
-    #     # damn selection error !!
-    #     pass
