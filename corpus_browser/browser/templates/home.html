@@ -19,55 +19,58 @@
     <div class="container">
         <!-- Example row of columns -->
         <div class="row">
-                <div class="col-lg-4 well form-group">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="process" value="concordance" checked>
-                            concordance </label>
-                    </div>
+            <div class="col-lg-4 well form-group">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="process" value="concordance" checked>
+                        concordance </label>
                 </div>
-                <div class="col-lg-4 local-well form-group">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="process" value="collocations">
-                            collocations </label>
-                    </div>
+            </div>
+            <div class="col-lg-4 local-well form-group">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="process" value="collocations">
+                        collocations </label>
+                </div>
 
-                    <select class="form-control" name="collocation_algorithm">
-                         <option value="None">choose ...</option>
-                         <option value="mutual_information">mutual information</option>
-                         <option value="log_likelihood">log likelihood</option>
-                         <option value="t-score">t-score</option>
-                    </select>
+                <select class="form-control" name="collocation_algorithm">
+                    <option value="None">choose ...</option>
+                    <option value="mutual_information">mutual information</option>
+                    <option value="log_likelihood">log likelihood</option>
+                    <option value="t-score">t-score</option>
+                </select>
+            </div>
+            <div class="col-lg-4 well form-group">
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="process" value="NGram">
+                        ngram </label>
                 </div>
-                <div class="col-lg-4 well form-group">
-                    <div class="radio">
-                        <label>
-                            <input type="radio" name="process" value="NGram">
-                            ngram </label>
-                    </div>
-                    
-                    <div>
+
+                <div>
                     <input type="number" name="ngram_size" value="2">
-                    </div>
-                    <select class="form-control" name="ngram_estimator">
-                         <option value="None">choose ...</option>
-                         <option value="MLEEstimator">maximum likelihood</option>
-                         <option value="LidstoneEstimator">add k smoothing</option>
-                         <option value="LaplaceEstimator">add one smoothing</option>
-                         <option value="ELEEstimator">expected estimation</option>
-                         <option value="UnigramPriorEstimator">unigram prior</option>
-                    </select>
                 </div>
-                <!-- </form> -->
+                <select class="form-control" name="ngram_estimator">
+                    <option value="None">choose ...</option>
+                    <option value="MLEEstimator">maximum likelihood</option>
+                    <option value="LidstoneEstimator">add k smoothing</option>
+                    <option value="LaplaceEstimator">add one smoothing</option>
+                    <option value="ELEEstimator">expected estimation</option>
+                    <option value="UnigramPriorEstimator">unigram prior</option>
+                </select>
+            </div>
+            <!-- </form> -->
         </div>
-        <hr>
 
-        <!-- <footer>
-        <p>
-        &copy; Company 2013
-        </p>
-        </footer> -->
     </div>
 </form>
+<hr>
+{% block additional_content %}
+
 {% endblock %}
+{% endblock %}
+<!-- <footer>
+<p>
+&copy; Company 2013
+</p>
+</footer> -->

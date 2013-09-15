@@ -19,8 +19,10 @@ def _collocation(request):
 
     return render(request,
            'collocation.html',
-           {'title': 'Collocation', 'collocations':collocations}
+           {'title': 'Collocation', 'collocations': collocations,
+            'tokens': ' '.join(q.tokens), 'algorithm': scoring_algorithm}
         )
+
 
 def _ngram(request):
     search_phrase = request.GET['search_phrase']
@@ -32,8 +34,9 @@ def _ngram(request):
 
     return render(request,
             'ngrams.html',
-            {'title':'NGrams', 'ngrams': ngrams, 'search_phrase': search_phrase}
+            {'title': 'NGrams', 'ngrams': ngrams, 'search_phrase': search_phrase}
         )
+
 
 def _concordance(request):
     search_phrase = request.GET['search_phrase']
@@ -43,11 +46,12 @@ def _concordance(request):
 
     return render(request,
                   'concordance.html',
-                  {'title':'Concordance',
+                  {'title': 'Concordance',
                    'results':results,
                    'tokens': tokens,
                    'search_phrase': search_phrase}
                 )
+
 
 def _extract_process_type(request):
     try:
@@ -61,6 +65,7 @@ def _extract_process_type(request):
     except KeyError:
         # you should select process !
         raise ValueError('You choosed a wrong process!')
+
 
 def search(request):
     process_func = _extract_process_type(request)
