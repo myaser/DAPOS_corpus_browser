@@ -61,27 +61,6 @@ class IndexQuerySet(QuerySet):
                 return self._collect_freq(self.intersect(token__in=tokens))
             return self._collect_freq(self.proximity(window=window, token__in=tokens))
 
-#     def intersect(self, token__in=[]):
-#         '''
-#         find documents that have all tokens of the query set.
-#         "AND boolean query"
-#         TODO: performance enhancement
-#         '''
-# 
-#         self = self.filter(token__in=token__in).order_by()
-# 
-#         if not self or len(self) != len(token__in):
-#             return []
-# 
-#         self = [index.as_result for index in self]
-#         result, remaining = set(self[0]), self[1:]
-# 
-#         result = result.intersection(*remaining)
-#         for posting in result:
-#             for _posting in list(itertools.chain.from_iterable(self)):
-#                     if posting == _posting:
-#                         posting.positions.extend(_posting.positions)
-#         return list(result)
     def intersect(self, token__in=[]):
         '''
         find documents that have all tokens of the query set.
@@ -95,11 +74,14 @@ class IndexQuerySet(QuerySet):
             return []
 
         common = [index.as_result for index in queryset]
-        result, remaining = set(common[0]), common[1:]
+        return self._intersect(common[0], common[1:])
 
-        result = result.intersection(*remaining)
+    def _intersect(self, result, other_results):
+        all_results = [result] + other_results
+        result = set(result)
+        result = result.intersection(*other_results)
         for posting in result:
-            for _posting in list(itertools.chain.from_iterable(common)):
+            for _posting in list(itertools.chain.from_iterable(all_results)):
                     if posting == _posting:
                         posting.positions.extend(_posting.positions)
         return list(result)
@@ -110,8 +92,11 @@ class IndexQuerySet(QuerySet):
         query set near each other in window size
         '''
         common = self.intersect(token__in=token__in)
+        return self._proximity(common, window)
+
+    def _proximity(self, boolean_results, window=1):
         result = []
-        for posting in common:
+        for posting in boolean_results:
             positions_lists = zip(*posting.positions)[1]
             for item in itertools.product(*positions_lists):
                 if max(item) - min(item) <= window:
@@ -120,9 +105,12 @@ class IndexQuerySet(QuerySet):
 
     def consequent(self, token__in=[]):
         common = self.intersect(token__in=token__in)
+        return self._consequent(token__in, common)
+
+    def _consequent(self, token__in, boolean_results):
         num_tokens = len(token__in)
         result = []
-        for posting in common:
+        for posting in boolean_results:
             pos = dict(posting.positions)
             positions_lists = [pos[token] for token in token__in]
 
@@ -132,3 +120,20 @@ class IndexQuerySet(QuerySet):
                 if item == tuple(range(start, start + num_tokens)):
                     result.append(posting)
         return result
+
+    def collocation_frequency(self, collocation_tokens, search_tokens, search_result, window=None):
+        queryset = self.filter(token__in=collocation_tokens)
+        results = {}
+        for index in queryset:
+            collocation = self._intersect(index.as_result, search_result)
+            if window is None:
+                # consequent in both directions
+                collocation = self._consequent(
+                               search_tokens + collocation_tokens, collocation)
+                collocation += self._consequent(
+                               collocation_tokens + search_tokens, collocation)
+            if window > 0:
+                collocation = self._proximity(collocation, window)
+
+            results.update({index.token: len(collocation)})
+        return results

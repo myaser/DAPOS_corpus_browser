@@ -25,10 +25,10 @@ class TestCollocationer(MongoTestCase):
         self.collocationer = Collocationer('t-score')
         self.collocationer.set_index(AuxiliaryIndex)
         self.tokens = [u'الله', u'كبير']
-        self.queryset = AuxiliaryIndex.objects.intersect(token__in=self.tokens)
+        self.search_result = AuxiliaryIndex.objects.intersect(token__in=self.tokens)
 
     def test_other_tokens(self):
-        tokens = self.collocationer._other_tokens(self.queryset, set(self.tokens), 5)
+        tokens = self.collocationer._other_tokens(self.search_result, set(self.tokens), 5)
         self.assertEqual(set([
             u'الفاشلين', u'في', u'الخروج', u'الليلة', u'دي', u'زيي', u'اقعدوا',
             u'صلوا', u'وادعوا..', u'الدعا', u'بيرد', u'القضا،', u'ادعو', u'خوف',
@@ -39,7 +39,7 @@ class TestCollocationer(MongoTestCase):
 
     def test_extract_freq(self):
         self.collocationer.window = 0
-        freqs = self.collocationer.extract_freq(self.tokens, u'خوف', self.queryset)
+        freqs = self.collocationer.extract_freq(self.tokens, u'خوف', self.search_result)
         self.assertEqual((1, (1, 1), 7222.0), freqs)
 
     def test_t_score(self):
