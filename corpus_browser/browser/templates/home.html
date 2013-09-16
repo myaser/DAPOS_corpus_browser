@@ -15,7 +15,11 @@
             <!-- </form> -->
         </div>
     </div>
-
+    <div class="errors">
+        {% for field, errors in form.errors.items %}
+            {{ field }}: {% for error in errors %}{{error}}{%endfor%}<br/>
+        {% endfor %}
+    </div>
     <div class="container">
         <!-- Example row of columns -->
         <div class="row">
