@@ -39,20 +39,24 @@ class TestCollocationer(MongoTestCase):
 
     def test_extract_freq(self):
         self.collocationer.window = 0
-        freqs = self.collocationer.extract_freq(self.tokens, u'خوف', self.search_result)
-        self.assertEqual((1, (1, 1), 7222.0), freqs)
+        freq = AuxiliaryIndex.objects.collocation_frequency([u'خوف'], self.tokens,
+                                                  self.search_result, window=0)
+        self.assertEqual(1, freq[u'خوف'])
 
     def test_t_score(self):
+        # TODO:
         query_processor = QueryProcessor(AuxiliaryIndex, u'الله كبير', Collocationer('t-score'))
         result = query_processor.excute_query()
         self.assertTrue(isinstance(result, Iterable))
 
     def test_mutual_information(self):
+        # TODO:
         query_processor = QueryProcessor(AuxiliaryIndex, u'الله كبير', Collocationer('mutual_information'))
         result = query_processor.excute_query()
         self.assertTrue(isinstance(result, Iterable))
 
     def test_log_likelihood(self):
+        # TODO:
         query_processor = QueryProcessor(AuxiliaryIndex, u'الله كبير', Collocationer('log_likelihood'))
         result = query_processor.excute_query()
         self.assertTrue(isinstance(result, Iterable))
