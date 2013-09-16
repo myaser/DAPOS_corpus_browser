@@ -68,7 +68,7 @@ class IndexQuerySet(QuerySet):
         TODO: performance enhancement
         '''
 
-        queryset = self.filter(token__in=token__in).order_by()
+        queryset = self.filter(token__in=token__in).order_by().select_related()
 
         if not queryset or len(queryset) != len(token__in):
             return []
@@ -122,7 +122,7 @@ class IndexQuerySet(QuerySet):
         return result
 
     def collocation_frequency(self, collocation_tokens, search_tokens, search_result, window=None):
-        queryset = self.filter(token__in=collocation_tokens)
+        queryset = self.filter(token__in=collocation_tokens).select_related()
         results = {}
         for index in queryset:
             collocation = self._intersect(index.as_result, [search_result])
