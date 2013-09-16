@@ -1,15 +1,15 @@
 from .fetcher import fetch_hash_tweets, fetch_user_tweets
-from .decorators import filter_tweets
+from .decorators import filter_tweets, extract_new_criterion
 from celery import task
 from indexer.models import Tweet
 from django.db import transaction
 import re
 from datetime import datetime
-
+from mongoengine.queryset import NotUniqueError
 
 month_to_nums = {
     'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'Jun': 5, 'Jul': 6, 'Aug': 7,
-    'Seb': 9,'Oct': 10, 'Nov': 11, 'Des': 12
+    'Sep': 9,'Oct': 10, 'Nov': 11, 'Des': 12
 }
 
 @transaction.commit_on_success
@@ -19,7 +19,10 @@ def bulk_create(Model, *intries):
         use transaction to make one commit for all data
     '''
     for intry in intries:
-        Model.objects.create(**intry)
+        try:
+            Model.objects.create(**intry)
+        except NotUniqueError:
+            pass
 
 def extract_date(date_string):
     '''
@@ -52,6 +55,7 @@ def extract_data(json):
         'links': [link.get('url', Empty) for link in json.get('entities', Empty).get('urls', Empty) + json.get('entities', Empty).get('media', Empty)],
     }
 
+@extract_new_criterion
 @filter_tweets
 def fetch(criterion):
     '''
@@ -60,8 +64,9 @@ def fetch(criterion):
         (side effect!)update critrion with the last tweet_id
     '''
     tweets = map(extract_data, criterion.fetch_data())
-    criterion.last_tweet_id = tweets[0]['tweet_id']
-    criterion.save()
+    if len(tweets) > 0:
+        criterion.last_tweet_id = tweets[0]['tweet_id']
+        criterion.save()
     return tweets
 
 
