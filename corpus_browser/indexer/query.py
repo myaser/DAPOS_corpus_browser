@@ -81,9 +81,9 @@ class IndexQuerySet(QuerySet):
         result = set(result)
         result = result.intersection(*other_results)
         for posting in result:
-            for _posting in list(itertools.chain.from_iterable(all_results)):
-                    if posting == _posting:
-                        posting.positions.extend(_posting.positions)
+            for _posting in itertools.chain.from_iterable(all_results):
+                if posting == _posting:
+                    posting.positions.extend(_posting.positions)
         return list(result)
 
     def proximity(self, window=1, token__in=[]):
@@ -125,7 +125,8 @@ class IndexQuerySet(QuerySet):
         queryset = self.filter(token__in=collocation_tokens)
         results = {}
         for index in queryset:
-            collocation = self._intersect(index.as_result, search_result)
+            collocation = self._intersect(index.as_result, [search_result])
+
             if window is None:
                 # consequent in both directions
                 collocation = self._consequent(

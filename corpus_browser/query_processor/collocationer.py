@@ -26,13 +26,6 @@ class Collocationer(Operator):
             other_tokens = other_tokens | (set(document.tokens) - tokens)
         return other_tokens
 
-#     def extract_freq(self, w1, w2, queryset):
-#         freq1 = len(queryset)
-#         freq2 = self.index.objects.frequency(w2)
-#         collocation_freq = self.index.objects.frequency(w1, w2, window=self.window)
-# 
-#         return (collocation_freq, (freq1, freq2), self.index.get_size())
-
     def operate(self, queryset, tokens, window=5, *args, **kwargs):
 
         other_tokens = self._other_tokens(queryset, set(tokens), window)
@@ -53,6 +46,6 @@ class Collocationer(Operator):
              (search_tokens_freq, other_tokens_freqs[token]), corpus_size)
             collocations.update({token: self.scoring_fn(*score_params)})
 
-        import pdb; pdb.set_trace()
-#         return sorted(self.collocations(self.tokens, self.other_tokens, self.search_result),
-#                       reverse=True, key=lambda item: item[1])
+        collocations = sorted(collocations.items(),
+                              key=lambda coll: coll[1], reverse=True)
+        return collocations
