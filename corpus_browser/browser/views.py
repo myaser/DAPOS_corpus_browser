@@ -13,7 +13,7 @@ logger = logging.getLogger()
 
 def main(request):
     context = request.GET.dict()
-    context.update({'title': 'DAPOS'})
+    context.update(title='DAPOS', form=SearchForm())
     return render(request, 'home.html', context)
 
 

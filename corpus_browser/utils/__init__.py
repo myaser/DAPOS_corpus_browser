@@ -3,6 +3,8 @@ from _abcoll import Mapping
 from django.forms.models import model_to_dict
 from timeit import itertools
 from django.core.cache import cache
+from itertools import chain
+
 
 
 class Counter(StandardCounter):
@@ -71,3 +73,12 @@ cache_keys = ['max_value', 'corpus_size', 'tokens_count', 'hapaxes']
 
 def clear_cache():
     cache.delete_many(cache_keys)
+
+
+def flatten(listOfLists):
+    "Flatten one level of nesting"
+    return list(chain.from_iterable(listOfLists))
+
+def iter_to_str(iterable):
+    value = u"', '".join(iterable)
+    return u"('" + value + u"')"
