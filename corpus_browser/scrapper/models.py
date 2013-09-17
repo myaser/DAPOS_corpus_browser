@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from scrapper.crawler import fetcher
 from utils import iter_to_str
-
+from requests.exceptions import RequestException
 # from tasks import lunch_crawlers
 
 
@@ -63,6 +63,6 @@ class Criterion(models.Model):
                 self.USER_NAME: fetcher.fetch_user_tweets,
                 self.HASH_TAG: fetcher.fetch_hash_tweets,
             }.get(self.type)(self.value, self.last_tweet_id)
-        except:
-            pass  # rescue from connection errors !
+        except RequestException:
+            return []  # rescue from connection errors !
 

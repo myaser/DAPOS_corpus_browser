@@ -78,3 +78,4 @@ def update_tweets(criteria):
     '''
     for criterion in criteria:
         bulk_create(Tweet, *fetch(criterion))
+        time.sleep(5)
