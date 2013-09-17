@@ -10,6 +10,7 @@ from forms import SearchForm
 import logging
 logger = logging.getLogger()
 
+
 def main(request):
     context = request.GET.dict()
     context.update(title='DAPOS', form=SearchForm())

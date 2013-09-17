@@ -70,6 +70,7 @@ def change_collection(collection=None):
 
 
 cache_keys = ['max_value', 'corpus_size', 'tokens_count', 'hapaxes']
+
 def clear_cache():
     cache.delete_many(cache_keys)
 

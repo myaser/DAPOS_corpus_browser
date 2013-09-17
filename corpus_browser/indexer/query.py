@@ -1,8 +1,9 @@
-from utils import Counter
+from utils import Counter, flatten
 from mongoengine import QuerySet
 import itertools
 from types import StringTypes
 from collections import Iterable
+from copy import deepcopy
 
 
 class TweetsQuerySet(QuerySet):
@@ -68,7 +69,7 @@ class IndexQuerySet(QuerySet):
         TODO: performance enhancement
         '''
 
-        queryset = self.filter(token__in=token__in).order_by()
+        queryset = self.filter(token__in=token__in).order_by().select_related_documents()
 
         if not queryset or len(queryset) != len(token__in):
             return []
@@ -122,8 +123,9 @@ class IndexQuerySet(QuerySet):
         return result
 
     def collocation_frequency(self, collocation_tokens, search_tokens, search_result, window=None):
-        queryset = self.filter(token__in=collocation_tokens)
+        queryset = self.filter(token__in=collocation_tokens).select_related_documents()
         results = {}
+
         for index in queryset:
             collocation = self._intersect(index.as_result, [search_result])
 
@@ -138,3 +140,27 @@ class IndexQuerySet(QuerySet):
 
             results.update({index.token: len(collocation)})
         return results
+
+    def select_related_documents(self):
+        from indexer.models import Tweet
+
+        # collect ids
+        result = self.clone()
+
+        ids = set(flatten([[posting._data['document'].id
+                        for posting in index.postings] for index in result]))
+
+        # query documents
+        docs = Tweet.objects.filter(id__in=ids)
+        assert len(docs) == len(ids)
+        tweets = dict(zip([tweet.id for tweet in docs], docs))
+
+        # replace documents
+        def derefrence(posting):
+            posting._data['document'] = tweets[posting._data['document'].id]
+            return posting
+
+        for index in result:
+            map(derefrence, index.postings)
+
+        return result
