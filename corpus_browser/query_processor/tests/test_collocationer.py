@@ -37,7 +37,7 @@ class TestCollocationer(MongoTestCase):
             u'بيرد', u'القضا،', u'ادعو', u'خوف', u'وطمع..']),
             tokens)
 
-    def test_extract_freq(self):
+    def test_collocation_frequency(self):
         self.collocationer.window = 0
         freq = AuxiliaryIndex.objects.collocation_frequency([u'خوف'], self.tokens,
                                                   self.search_result, window=0)

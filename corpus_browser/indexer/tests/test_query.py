@@ -5,16 +5,23 @@
 import os
 
 from corpus_browser.settings import PROJECT_ROOT
-from indexer.models import AuxiliaryIndex
+from indexer.models import AuxiliaryIndex, Tweet
 from utils.tests import MongoTestCase
 
 
 class TestIndexQuerySet(MongoTestCase):
 
     def setUp(self):
-        fixture_file = os.path.join(PROJECT_ROOT, 'indexer/fixtures/testindex.json')
-        fixture = open(fixture_file).read()
-        AuxiliaryIndex.load_data(fixture)
+        fixture_file = os.path.join(PROJECT_ROOT,
+                                            'indexer/fixtures/testindex.json')
+        self.index_fixture = open(fixture_file).read()
+        AuxiliaryIndex.load_data(self.index_fixture)
+
+        fixture_file = os.path.join(PROJECT_ROOT,
+                                            'indexer/fixtures/testtweets.json')
+        self.tweet_fixture = open(fixture_file).read()
+        Tweet.load_data(self.tweet_fixture)
+
         self.token1 = u"\u0648\u0627\u0639\u062f"
         self.token2 = u"\u0647\u064a\u062a\u062c\u0646\u0646\u0648\u0627"
         self.token3 = u"\u0648\u0627\u0642\u0641\u0629"
@@ -90,3 +97,12 @@ class TestIndexQuerySet(MongoTestCase):
         freq6 = AuxiliaryIndex.objects.frequency(u'مصر', u'الإخوان', window=3)
         self.assertEqual(0, freq6)
 
+    def test_select_related_documents(self):
+        def exrtact_doc_ids(index_object):
+            return [posting.document.id for posting in index_object.postings]
+
+        queryset = AuxiliaryIndex.objects.filter(token__in=[u'مصر', u'الإخوان'])
+        queryset_related = queryset.clone().select_related_documents()
+        self.assertEqual(len(queryset), len(queryset_related))
+        self.assertEqual(map(exrtact_doc_ids, queryset),
+                         map(exrtact_doc_ids, queryset_related))
