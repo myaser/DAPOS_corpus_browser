@@ -1,0 +1,15 @@
+language: python
+
+python:
+  - "2.7"
+
+before_install:
+  - sudo su -c "requirements/mongo.sh"
+  - sudo service mongodb start
+
+install: "pip install -r requirements/requirements.pip"
+
+script: coverage run --rcfile="./.coveragerc" corpus_browser/manage.py test corpus_browser -v 3 --traceback
+
+after_success:
+    coveralls

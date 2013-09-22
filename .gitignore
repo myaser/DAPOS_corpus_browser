@@ -1,0 +1,56 @@
+# general
+*~
+
+# git
+*.orig
+
+# python
+*.pyc
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# virtual env
+env
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+html_coverage_report/
+
+# Translations
+*.mo
+
+# eclipse
+.project
+.pydevproject
+.settings
+
+#sqlite3
+*.db
+*.db-journal
+
+# django
+*.log
+*.pot
+local_settings.py
+/corpus_browser/celerybeat-schedule

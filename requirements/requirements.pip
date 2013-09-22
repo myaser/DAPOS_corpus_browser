@@ -1,0 +1,17 @@
+django>=1.5
+Pillow
+simplejson
+
+django-extensions
+django-debug-toolbar
+django-debug-toolbar-mongo
+django-discover-runner 
+
+coveralls
+twython
+django-celery
+
+mongoengine
+nltk
+
+python-memcached

@@ -1,0 +1,22 @@
+{% extends "home.html" %}
+
+{% load query_extra %}
+
+{% block additional_content %}
+
+<div class="container">
+    <table class="table table-bordered table-hover highlight-rows" dir="rtl">
+        <tr>
+            <th>تغريدة</th>
+        </tr>
+        {% for result in results %}
+            <tr>
+                <td class="formalize-column-text"><a href="{{result.document.tweet_id}}">
+                {{ result.document.tweet_text|safe|highlight:result.positions }}
+                </a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
