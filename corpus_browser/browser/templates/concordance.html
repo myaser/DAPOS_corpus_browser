@@ -12,6 +12,7 @@
         {% for result in results %}
             <tr>
                 <td class="formalize-column-text"><a href="{{result.document.tweet_id}}">
+
                 {{ result.document.tweet_text|safe|highlight:result.positions }}
                 </a></td>
             </tr>

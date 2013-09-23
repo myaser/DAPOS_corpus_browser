@@ -1,3 +1,4 @@
+
 $(document).ready(function(){
   $('.query-item input:radio').on('change',function(){
     $('.query-item input:radio').prop('disabled',true);
