@@ -9,6 +9,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
 
 ADMINS = (
     ('Mahmoud Yaser', 'me.MahmoudYaser@gmail.com'),
+    ('Mo\'men Abd ElKader', 'moemenology@gmail.com'),
 )
 
 MANAGERS = ADMINS
