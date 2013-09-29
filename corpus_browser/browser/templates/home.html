@@ -5,8 +5,8 @@
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
         <div class="container">
-            <div class="col-lg-2"></div>
-            <div class="form-group col-lg-8">
+            <div class="form-group col-lg-9 col-lg-offset-1">
+
                 <input type="text" class="form-control input-lg" name="search_phrase" value="{{ search_phrase }}">
             </div>
             <button type="submit" class="btn btn-default btn-lg btn-primary" id="search">
@@ -15,48 +15,38 @@
             <!-- </form> -->
         </div>
     </div>
-    <div class="errors">
-        {% for field, errors in form.errors.items %}
-            {{ field }}: {% for error in errors %}{{error}}{%endfor%}<br/>
-        {% endfor %}
-    </div>
     <div class="container">
         <!-- Example row of columns -->
-        <div class="row">
-            <div class="col-lg-4 well form-group">
-                <div class="radio">
+        <div class="row centered-row ">
+            <div class="col-lg-4  form-group query-item">
                     <label>
                         <input type="radio" name="process" value="concordance" {% if process == 'concordance' or process == None %}checked{%endif%}>
-                        concordance </label>
-                </div>
+                        concordance
+                    </label>
             </div>
-            <div class="col-lg-4 local-well form-group">
-                <div class="radio">
+            <div class="col-lg-4 form-group query-item">
                     <label>
                         <input type="radio" name="process" value="collocations" {% if process == 'collocations' %}checked{%endif%}>
                         collocations </label>
-                </div>
 
-                <select class="form-control" name="collocation_algorithm">
+                <select class="form-control form-item" name="collocation_algorithm">
                     <option value="None">choose ...</option>
-                    <option value="mutual_information"{%if collocation_algorithm == 'mutual_information' %} selected="selected"{%endif%}>mutual information</option>
-                    <option value="log_likelihood"{%if collocation_algorithm == 'log_likelihood' %} selected="selected"{%endif%}>log likelihood</option>
+                    <option value="mutual_information" {% if collocation_algorithm == 'mutual_information' %} selected="selected" {% endif %}> mutual information</option>
+                    <option value="log_likelihood" {%if collocation_algorithm == 'log_likelihood' %} selected="selected"{%endif%}>log likelihood</option>
                     <option value="t-score"{%if collocation_algorithm == 't-score' %} selected="selected"{%endif%}>t-score</option>
                 </select>
             </div>
-            <div class="col-lg-4 well form-group">
-                <div class="radio">
+            <div class="col-lg-4  form-group query-item">
                     <label>
-                        <input type="radio" name="process" value="NGram" {% if process == 'NGram' %}checked{%endif%}>
-                        ngram </label>
-                </div>
+                        <input type="radio" name="process" value="NGram" {% if process == 'NGram' %} checked {% endif %} >
+                        n-gram
+                    </label>
 
-                <div>
-                    <input type="number" name="ngram_size" value="{{ngram_size|default:"2"}}">
-                </div>
-                <select class="form-control" name="ngram_estimator">
-                    <option value="None">choose ...</option>
-                    <option value="MLEEstimator"{%if ngram_estimator == 'MLEEstimator' %} selected="selected"{%endif%}>maximum likelihood</option>
+                <input type="number" name="ngram_size" value="{{ngram_size|default:"2"}}" class="form-control form-item">
+                <select class="form-control form-item" name="ngram_estimator">
+                    <option value="None"> choose ... </option>
+                    <option value="MLEEstimator" {%if ngram_estimator == 'MLEEstimator' %} selected="selected"{%endif%}>maximum likelihood</option>
+
                     <option value="LidstoneEstimator" {%if ngram_estimator == 'LidstoneEstimator' %} selected="selected"{%endif%}>add k smoothing</option>
                     <option value="LaplaceEstimator" {%if ngram_estimator == 'LaplaceEstimator' %} selected="selected"{%endif%}>add one smoothing</option>
                     <option value="ELEEstimator" {%if ngram_estimator == 'ELEEstimator' %} selected="selected"{%endif%}>expected estimation</option>
@@ -65,10 +55,14 @@
             </div>
             <!-- </form> -->
         </div>
-
     </div>
+    <div class="errors">
+        {% for field, errors in form.errors.items %}
+            {{ field }}: {% for error in errors %}{{error}}{%endfor%}<br/>
+        {% endfor %}
+    </div>
+
 </form>
-<hr>
 {% block additional_content %}
 
 {% endblock %}
