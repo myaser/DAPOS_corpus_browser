@@ -17,7 +17,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'corpus.db',
+        'NAME': os.path.join(PROJECT_ROOT, 'corpus.db'),
     }
 }
 MONGO_DATABASE_NAME = 'corpus'
