@@ -5,6 +5,7 @@ from indexer.models import Tweet
 from django.db import transaction
 import re
 from datetime import datetime
+import time
 from mongoengine.queryset import NotUniqueError
 
 month_to_nums = {
